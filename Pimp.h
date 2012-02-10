@@ -87,11 +87,11 @@ private:
     void roomRecognition();
     
     // File path
-    string dir;
-    string faceDir;
-    string knownFacesDoc;
-    string unknownFacesDoc;
-    string roomDir;
+    std::string dir;
+    std::string faceDir;
+    std::string knownFacesDoc;
+    std::string unknownFacesDoc;
+    std::string roomDir;
     
     // Output
     std::string personInImage;
