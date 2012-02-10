@@ -56,9 +56,14 @@ DisplayPageGTK::DisplayPageGTK()
     Pimp::sharedPimp().initProcess();
 }
 
+void DisplayPageGTK::runLoop()
+{
+    // Run the main loop
+    Pimp::sharedPimp().mainProcess();
+}
+
 void DisplayPageGTK::display()
 {
-    
     // Draw the title
     gtk_widget_show (title);
     
@@ -72,9 +77,6 @@ void DisplayPageGTK::display()
     // Draw the buttons and sliders
     gtk_widget_show (btn_back);
     
-    
-    // Run the main loop
-    Pimp::sharedPimp().mainProcess();
 	gtk_label_set_text(GTK_LABEL(personName),(gchar*)Pimp::sharedPimp().getRecognizedPerson().c_str());
-   gtk_label_set_text(GTK_LABEL( roomName), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
+    gtk_label_set_text(GTK_LABEL( roomName), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
 }
