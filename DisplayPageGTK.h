@@ -16,13 +16,13 @@ class DisplayPageGTK : public BasePageGTK
 {
 private:
     // Title
-    std::string title;
-    std::string personTitle;
-    std::string roomTitle;
+    GtkWidget *title;
+    GtkWidget *personTitle;
+    GtkWidget *roomTitle;
     
     // Display Text
-    std::string personName;
-    std::string roomName;
+    GtkWidget *personName;
+    GtkWidget *roomName;
     
     // Buttons
     GtkWidget *btn_back;

@@ -26,11 +26,24 @@ DisplayPageGTK::DisplayPageGTK()
     window = gtk_vbox_new (TRUE,1);
     
     // Title
-    title = "Display Page";
-    personTitle = "Person: ";
-    roomTitle = "Room: ";
-    personName = "";
-    roomName = "";
+    title = gtk_label_new("Display Page");
+    gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
+
+	GtkWidget *box = gtk_hbox_new (TRUE, 1);
+	
+    personTitle = gtk_label_new("Person: ");
+    gtk_box_pack_start(GTK_BOX (box), personTitle, TRUE, TRUE, 0);
+    personName =gtk_label_new( "");
+    gtk_box_pack_start(GTK_BOX (box), personName, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
+
+	box = gtk_hbox_new(TRUE,1);
+
+    roomTitle = gtk_label_new("Room: ");
+    gtk_box_pack_start(GTK_BOX (box), roomTitle, TRUE, TRUE, 0);
+    roomName =gtk_label_new( "");
+    gtk_box_pack_start(GTK_BOX (box), roomName, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
     
     // Buttons
     btn_back = gtk_button_new_with_label ("Back");
@@ -47,10 +60,13 @@ void DisplayPageGTK::display()
 {
     
     // Draw the title
-        
+    gtk_widget_show (title);
     
     // Draw the person and room names
-        
+    gtk_widget_show (personTitle);
+    gtk_widget_show (personName);
+    gtk_widget_show (roomTitle);
+    gtk_widget_show (roomName);
     
     
     // Draw the buttons and sliders
@@ -59,6 +75,6 @@ void DisplayPageGTK::display()
     
     // Run the main loop
     Pimp::sharedPimp().mainProcess();
-    personName = Pimp::sharedPimp().getRecognizedPerson();
-    roomName = Pimp::sharedPimp().getRecognizedRoom();
+	gtk_label_set_text(GTK_LABEL(personName),(gchar*)Pimp::sharedPimp().getRecognizedPerson().c_str());
+   gtk_label_set_text(GTK_LABEL( roomName), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
 }
