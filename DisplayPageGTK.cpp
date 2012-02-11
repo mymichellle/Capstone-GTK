@@ -18,14 +18,39 @@ extern "C"{
         Pimp::sharedPimp().videoOff();
         Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
     }
+
+	static gboolean time_handler(GtkWidget *widget)
+	{
+		// Run the main loop until the display page does not exist
+ 		if (widget->window == NULL) return FALSE;
+    	Pimp::sharedPimp().mainProcess();  
+		gtk_widget_queue_draw(widget);
+ 	 	return TRUE;
+	}
+
+	// Update the recognized person display
+	static gboolean update_person_name(GtkWidget *widget)
+	{
+ 		if (widget->window == NULL) return FALSE;
+		gtk_label_set_text(GTK_LABEL(widget),(gchar*)Pimp::sharedPimp().getRecognizedPerson().c_str());
+	}
+
+	// Update the recognized room display
+	static gboolean update_room_name(GtkWidget *widget)
+	{
+ 		if (widget->window == NULL) return FALSE;
+		gtk_label_set_text(GTK_LABEL( widget), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
+	}
 }
 
 DisplayPageGTK::DisplayPageGTK()
 {
     // Window box to contain this page
-    window = gtk_vbox_new (TRUE,1);
+    window = gtk_vbox_new (TRUE,1);  
+	g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) window); 
+	gtk_widget_show_all(window);
     
-    // Title
+	// Title
     title = gtk_label_new("Display Page");
     gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
@@ -36,6 +61,7 @@ DisplayPageGTK::DisplayPageGTK()
     personName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), personName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
+	g_timeout_add(500, (GSourceFunc) update_person_name, (gpointer) personName); 
 
 	box = gtk_hbox_new(TRUE,1);
 
@@ -44,6 +70,7 @@ DisplayPageGTK::DisplayPageGTK()
     roomName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), roomName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
+	g_timeout_add(500, (GSourceFunc) update_room_name, (gpointer) roomName); 
     
     // Buttons
     btn_back = gtk_button_new_with_label ("Back");
@@ -54,12 +81,15 @@ DisplayPageGTK::DisplayPageGTK()
     // Start the camera
     Pimp::sharedPimp().videoOn();
     Pimp::sharedPimp().initProcess();
+
+	// Create a timer
 }
 
 void DisplayPageGTK::runLoop()
 {
     // Run the main loop
-    Pimp::sharedPimp().mainProcess();
+	gtk_label_set_text(GTK_LABEL(personName),(gchar*)Pimp::sharedPimp().getRecognizedPerson().c_str());
+    gtk_label_set_text(GTK_LABEL( roomName), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
 }
 
 void DisplayPageGTK::display()

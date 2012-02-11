@@ -26,7 +26,11 @@ private:
     
     // Buttons
     GtkWidget *btn_back;
-        
+
+	// timeout handler id
+	guint timeout_handler_id;
+ 
+	void runLoop();       
 public:
     DisplayPageGTK();
     

@@ -194,13 +194,13 @@ void Pimp::mainProcess()
     current_frame = video->getImage();
     // set display_frame to flipped current_frame
     cvFlip (current_frame, display_frame, 1);
-    
+    /*
     // Face Recognition
     if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
     {
         faceRecognition();
         lastFaceCycle = cycleNum;
-    }
+    }*/
     
     // Room Recognition
     if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
