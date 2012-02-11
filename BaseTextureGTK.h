@@ -1,23 +1,19 @@
 //
-//  BaseTexture.h
+//  BaseTextureGTK.h
 //  PiMP
 //
 //  Created by Michelle Alexander on 12/1/11.
 //  Copyright 2011 ??? . All rights reserved.
 //
 
-#ifndef BaseTexture_h
-#define BaseTexture_h
+#ifndef BaseTextureGTK_h
+#define BaseTextureGTK_h
 
-#ifdef __APPLE__
-#include <GL/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include <gtk/gtk.h>
 #include <cv.h>
 #include <string>
 
-class BaseTexture
+class BaseTextureGTK
 {
 protected:
     // Name
@@ -25,15 +21,20 @@ protected:
     std::string fileName;
     
     // Texture
-    GLuint texture;
+	GtkWidget* gtk_img;
+	GtkWidget* convertOpenCv2Gtk(IplImage *image);
     void setTexture();
     
     // Image and display area
     IplImage *image;
     CvRect displayRegion;
+
+	// GTK box
+	GtkWidget *box;
     
 public:
-    BaseTexture();
+    BaseTextureGTK();
+	BaseTextureGTK(GtkWidget* holder);
     
     // Display Function
     virtual void draw();
@@ -42,6 +43,7 @@ public:
     
     // Getters and Setters
     IplImage* getImage(){return image;};
+	GtkWidget* getGtkImage(){return gtk_img;};
     void setImage(IplImage *img);
     virtual void setName(std::string n);
     virtual std::string getName();

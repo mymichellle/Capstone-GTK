@@ -127,6 +127,15 @@ void Pimp::updateEigenFaces(){
     eigenfaces->update();
 }
 
+
+void Pimp::getNewTexture(BaseTextureGTK *tex){
+    // Create a new face texture
+    current_frame = video->getImage();
+    display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
+    cvFlip (current_frame, display_frame, 1);
+    tex->setImage(display_frame);
+}
+
 // Set the Recognition Mode
 void Pimp::setMode(bool faceRecOn, int faceRecRate, bool roomRecOn, int roomRecRate)
 {

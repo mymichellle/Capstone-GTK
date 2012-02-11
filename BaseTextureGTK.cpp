@@ -1,12 +1,12 @@
 //
-//  BaseTexture.cpp
+//  BaseTextureGTK.cpp
 //  PiMP
 //
 //  Created by Michelle Alexander on 12/1/11.
 //  Copyright 2011 ??? . All rights reserved.
 //
 
-#include "BaseTexture.h"
+#include "BaseTextureGTK.h"
 #include "Pimp.h"
 #include <highgui.h>
 #include <iostream>
@@ -14,70 +14,81 @@
 
 using namespace std;
 
-BaseTexture::BaseTexture()
+BaseTextureGTK::BaseTextureGTK()
 {
     // Defualt values
     name = "unknown";
     fileName = "unknown";
     image = cvCreateImage(cvSize(10, 10), IPL_DEPTH_8U, 3);
+	box = gtk_hbox_new (TRUE,1);
 }
 
-void BaseTexture::setTexture()
+BaseTextureGTK::BaseTextureGTK(GtkWidget *holder)
 {
-    if (image != NULL)
-    {
-        glGenTextures(1, &texture);
-        
-        glBindTexture( GL_TEXTURE_2D, texture ); //bind the texture to it's array
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-        
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,0, GL_BGR, GL_UNSIGNED_BYTE, image->imageData);    
-    }    
+    // Defualt values
+    name = "unknown";
+    fileName = "unknown";
+    image = cvCreateImage(cvSize(10, 10), IPL_DEPTH_8U, 3);
+	box = gtk_hbox_new (TRUE,1);
+	gtk_box_pack_start( GTK_BOX(holder), box, TRUE, TRUE, 0);
+	
 }
 
-void BaseTexture::setImage(IplImage *img)
+void BaseTextureGTK::setTexture()
 {
+}
+
+GtkWidget *BaseTextureGTK::convertOpenCv2Gtk(IplImage *img)
+{ 
+	// make the gtk image 160x120
+	IplImage *gtkMask = cvCreateImage(cvSize (160, 120), IPL_DEPTH_8U, 3);
+	cvResize(img, gtkMask,CV_INTER_LINEAR);
+	//cvCvtColor( img, gtkMask, CV_BGR2RGB ); // Usually opencv image is BGR, so we need to change it to RGB 
+	GdkPixbuf *pix = gdk_pixbuf_new_from_data ((guchar*)gtkMask->imageData, 
+		GDK_COLORSPACE_RGB, 
+		FALSE, 
+		gtkMask->depth, 
+		gtkMask->width, 
+		gtkMask->height, 
+		(gtkMask->widthStep), 
+		NULL, 
+		NULL); 
+	GtkWidget *gtkWidg = gtk_image_new_from_pixbuf (pix);
+	return gtkWidg;
+} 
+
+
+void BaseTextureGTK::setImage(IplImage *img)
+{
+	// Remove any existing children from the image box
+	GList *children = gtk_container_get_children(GTK_CONTAINER(box));
+	for(int i = 0; i < g_list_length(children); i++)
+		gtk_container_remove(GTK_CONTAINER(box), (GtkWidget*) g_list_nth_data(children, i));
+
     image = cvCloneImage (img);
-    setTexture();
+    gtk_img = convertOpenCv2Gtk(image);
+	gtk_box_pack_start( GTK_BOX(box), gtk_img, TRUE, TRUE, 0);
 }
 
 
 
 // OpenGL draw as a texture
-void BaseTexture::draw()
+void BaseTextureGTK::draw()
 {
-    setTexture();
-    glColor3f(1,1,1);
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    
-    glBindTexture( GL_TEXTURE_2D, texture ); //bind the texture to it's array
-    
-    // Set the texture to a 100X100 square
-    glBegin( GL_QUADS );
-    glTexCoord2f(0,0); glVertex2f(image->width/8,image->height/8);
-    glTexCoord2f(1,0); glVertex2f(-image->width/8,image->height/8);
-    glTexCoord2f(1,1); glVertex2f(-image->width/8,-image->height/8);
-    glTexCoord2f(0,1); glVertex2f(image->width/8,-image->height/8);
-    glEnd(); 
-    
-    glDisable(GL_TEXTURE_2D);
+   gtk_widget_show (gtk_img);
 }
 
-string BaseTexture::getName()
+string BaseTextureGTK::getName()
 {return name;}
 
-void BaseTexture::setName(string n)
+void BaseTextureGTK::setName(string n)
 {
     // Name should always lower case
     name = n;
     transform(name.begin(), name.end(), name.begin(), ::tolower);
 }
 
-void BaseTexture::saveTextureAsJPG(string file)
+void BaseTextureGTK::saveTextureAsJPG(string file)
 {
     // Make sure filename is always lowercase
     fileName = file;

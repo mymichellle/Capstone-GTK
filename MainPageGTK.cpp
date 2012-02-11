@@ -11,8 +11,8 @@
 #include "Pimp.h"
 #include "SettingsPageGTK.h"
 #include "DisplayPageGTK.h"
+#include "RoomEntryPageGTK.h"
 /*#include "FaceEntryPage.h"
-#include "RoomEntryPage.h"
 #include "FaceTexture.h"*/
 
 #include <stdlib.h>
@@ -33,22 +33,19 @@ extern "C"{
     // Goes to the add a face page
     void MainPage_onNewRoomPress()
     {
-        //Pimp::sharedPimp().setDisplayPage(new RoomEntryPage());
-        g_print ("MainPage-room\n");
+        Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK());
     }
     
     // Runs room and face recognition
     void MainPage_onRecPress()
     {
         Pimp::sharedPimp().setDisplayPage(new DisplayPageGTK());
-        g_print ("MainPage-rec\n");
     }
     
     
     void MainPage_onSettingsPress()
     {
         Pimp::sharedPimp().setDisplayPage(new SettingsPageGTK());
-        g_print ("MainPage-set\n");
     }
     
     void MainPage_onTestPress()
@@ -87,11 +84,11 @@ MainPageGTK::MainPageGTK()
                         GTK_SIGNAL_FUNC (MainPage_onSettingsPress), NULL);
     gtk_box_pack_start(GTK_BOX (window), btn_settings, TRUE, TRUE,0);
     
-    btn_test = gtk_button_new_with_label ("Test"); 
+   /* btn_test = gtk_button_new_with_label ("Test"); 
     gtk_signal_connect (GTK_OBJECT (btn_test), "clicked",
                         GTK_SIGNAL_FUNC (MainPage_onTestPress), NULL);
     gtk_box_pack_start(GTK_BOX (window), btn_test, TRUE, TRUE,0);
-        
+        */
 }
 
 

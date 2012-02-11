@@ -1,100 +1,92 @@
 //
-//  RoomEntryPage.cpp
+//  RoomEntryPageGTK.cpp
 //  Pimp
 //
 //  Created by Michelle Alexander on 11/11/11.
 //  Copyright 2011 ??? . All rights reserved.
 //
 
-#include "RoomEntryPage.h"
-#include "MainPage.h"
-#ifdef __APPLE__
-#include <GL/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include "RoomEntryPageGTK.h"
+#include "MainPageGTK.h"
 #include <iostream>
 
-RoomEntryPage::RoomEntryPage()
+extern "C"{
+	// Goes back to main page
+	void RoomEntryPage_onBackPress()
+	{
+		Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
+		Pimp::sharedPimp().videoOff();
+	}
+
+	// Add Face
+	void RoomEntryPage_onAddPress(RoomTextureGTK *roomTex)
+	{    
+		//room->setName(dialog_name->getValue());
+		//Pimp::sharedPimp().addRoom(room);
+	}
+
+	// Get new image
+	void RoomEntryPage_onNewPress(RoomTextureGTK *roomTex)
+	{
+		//Pimp::sharedPimp().getNewTexture(roomTex);
+	}
+}
+
+RoomEntryPageGTK::RoomEntryPageGTK()
 {
-    btn_back = new BaseButton("Back", 100, 30);
-    btn_add = new BaseButton("Add", WINDOW_WIDTH/2, WINDOW_HEIGHT-250);
-    btn_new = new BaseButton("New Image", WINDOW_WIDTH/2, WINDOW_HEIGHT - 50);
-    dialog_name = new BaseDialog("Name: ", "Unknown", WINDOW_WIDTH/2, WINDOW_HEIGHT/4, 100);
+    // Window box to contain this page
+    window = gtk_vbox_new (FALSE,1);  
+
+	// Title
+    title = gtk_label_new("Add A Room");
+    gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
+
+	// Image
+	imgBox = gtk_hbox_new (TRUE,1);
+	gtk_box_pack_start( GTK_BOX(window), imgBox, TRUE, TRUE, 0);
+    room = new RoomTextureGTK(imgBox);
+
+	// Buttons
+	GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+	gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
+    btn_new = gtk_button_new_with_label("New Image");
+	gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
+						GTK_SIGNAL_FUNC (RoomEntryPage_onNewPress), room);
+	gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
+
+    btn_add = gtk_button_new_with_label("Add");
+	gtk_signal_connect (GTK_OBJECT (btn_add), "clicked",
+						GTK_SIGNAL_FUNC (RoomEntryPage_onAddPress), room);
+	gtk_box_pack_start( GTK_BOX(hbox), btn_add, TRUE, TRUE, 0);
+
+    btn_back = gtk_button_new_with_label ("Back");
+    gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+                        GTK_SIGNAL_FUNC (RoomEntryPage_onBackPress), NULL);
+    gtk_box_pack_start( GTK_BOX(window), btn_back, TRUE, TRUE, 0);
+
+
+
+    //dialog_name = new BaseDialog("Name: ", "Unknown", WINDOW_WIDTH/2, WINDOW_HEIGHT/4, 100);
     
-    room = new RoomTexture();
     
+	// Turn on the camera and take an image
     Pimp::sharedPimp().videoOn();
     Pimp::sharedPimp().getNewTexture(room);
-    title = "Add A Room";
-}
-
-// Goes back to main page
-void RoomEntryPage::onBackPress()
-{
-    Pimp::sharedPimp().setDisplayPage(new MainPage());
-    Pimp::sharedPimp().videoOff();
-}
-
-// Add Face
-void RoomEntryPage::onAddPress()
-{    
-    room->setName(dialog_name->getValue());
-    Pimp::sharedPimp().addRoom(room);
-}
-
-// Get new image
-void RoomEntryPage::onNewPress()
-{
-    Pimp::sharedPimp().getNewTexture(room);
-}
-
-// Handles mouse events
-void RoomEntryPage::mouse(int button, int state, int x, int y)
-{
-    // Check if the new or load buttons were pressed
-    if(btn_back->mouse(button, state, x, y))
-        onBackPress();
-    if(btn_add->mouse(button, state, x, y))
-        onAddPress();
-    if(btn_new->mouse(button, state, x, y))
-        onNewPress();
-    
-    dialog_name->mouse(button,state, x, y);
-}
-
-// Handles Keyboard events
-void RoomEntryPage::keyboard(unsigned char key, int x, int y)
-{
-    dialog_name->keyboard(key, x, y);
 }
 
 // Display
-void RoomEntryPage::display()
-{
-    glPushMatrix();
-    
+void RoomEntryPageGTK::display()
+{   
     // Draw the title
-    glColor3f(0, 0, .4);
-    int labelW = displayStringWidth(title);
-    int labelH = displayStringHeight(title);
-    glRasterPos3f((WINDOW_WIDTH/2 - labelW/2), (WINDOW_HEIGHT -10 - labelH/2), 0.5);  
-    displayString(title);
-    
+    gtk_widget_show (title);
+
     // Draw the buttons and dialogs
-    btn_back->draw();
-    btn_add->draw();
-    btn_new->draw();
-    dialog_name->draw();
+    gtk_widget_show (btn_back);
+    gtk_widget_show (btn_add);
+    gtk_widget_show (btn_new);
+    //gtk_widget_show (dialog_name->draw();
     
     // Draw the room image
-    glPushMatrix();
-    glTranslatef(WINDOW_WIDTH/2, WINDOW_HEIGHT/2+50, 0);
-    room->draw();
-    glPopMatrix();
-    
-    
-    glFlush();
-    glPopMatrix();
+    //room->draw();
     
 }

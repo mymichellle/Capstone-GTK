@@ -18,12 +18,13 @@
 #include "FacePreProcess.h"
 #include "Eigenfaces.h"
 #include "RoomRecognition.h"
+#include "BaseTextureGTK.h"
 
 /************    Debug enable triggers    *******************/
 #define DEBUG // Toggle all Debug code on
 #ifdef DEBUG
             
-            #define SHOW_VIDEO // Show the live video stream
+            //#define SHOW_VIDEO // Show the live video stream
 
 #endif
 /************************************************************/
@@ -125,6 +126,9 @@ public:
     void videoOn();
     void videoOff();
     
+	// helper functions
+	void getNewTexture(BaseTextureGTK *tex);
+
     void testProc();
     
     // Getters

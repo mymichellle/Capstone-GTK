@@ -45,7 +45,6 @@ IplImage* VideoStream::getImage()
     
     // Resize the frame
     cvResize(cvQueryFrame(capture), small_frame,CV_INTER_LINEAR);
-    cvSaveImage("testImg.jpg", small_frame);
     
     return small_frame;
 }
