@@ -13,9 +13,24 @@
 #include "RoomTextureGTK.h"
 #include "Pimp.h"
 
+enum RoomEntryMode
+{
+	INIT_ROOM,
+	IMG_ROOM
+};
+
 class RoomEntryPageGTK : public BasePageGTK
 {
+public:
+    RoomEntryPageGTK();
+	RoomEntryPageGTK(RoomEntryMode mode, std::string rName);
+
+    // Display
+    void display();
 private:
+	// Initialize function
+	void initPage(enum RoomEntryMode mode, std::string rName);
+
     // Title
     GtkWidget *title;
     
@@ -24,21 +39,20 @@ private:
     GtkWidget *btn_add;
     GtkWidget *btn_new;
     
-    // Dialog
-    GtkWidget *dialog_name;
-    
+	// img
+	RoomTextureGTK *room;
+	// Dialog
+	GtkWidget *dialog_name;
+
+	// Keyboad
+	GtkWidget *keyboard;
+
     // Properties
     std::string *name;
     
     // Textures
-	GtkWidget *imgBox;    
-	RoomTextureGTK *room;
+	GtkWidget *imgBox;
     
-public:
-    RoomEntryPageGTK();
-    
-    // Display
-    void display();
 };
 
 #endif

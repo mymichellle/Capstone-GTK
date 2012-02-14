@@ -1,18 +1,16 @@
 #ifndef KeyboardGTK_h
 #define KeyboardGTK_h
 
-#include <gtk/gtk.h>
-#include <gtk/gtkvbox.h>
+#include <glib.h>
 
-#ifdef __cplusplus
-extern "C"{
-#endif /*__cplusplus*/
+G_BEGIN_DECLS
 	
-#define KEYBOARDGTK(obj)			GTK_CHECK_CAST (obj, keyboardGTK_get_type (), KeyboardGTK)
-#define KEYBOARDGTK_CLASS(klass)	GTK_CHECK_CLASS_CAST (klass, keyboardGTK_get_type (), KeyboardGTKClass)
-#define	IS_KEYBOARDGTK(obj)			GTK_CHECK_TYPE (obj, keyboardGTK_get_type ())
-	
-	
+#define KEYBOARDGTK_TYPE            (keyboardGTK_get_type ())
+#define KEYBOARDGTK(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), KEYBOARDGTK_TYPE, KeyboardGTK))
+#define KEYBOARDGTK_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), KEYBOARDGTK_TYPE, KeyboardGTKClass))
+#define IS_KEYBOARDGTK(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), KEYBOARDGTK_TYPE))
+#define IS_KEYBOARDGTK_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), KEYBOARDGTK_TYPE))
+
 #define ALPHA_KEYS 26
 #define SPECIAL_KEYS 3
 	
@@ -24,6 +22,8 @@ struct _KeyboardGTK
 	GtkVBox vbox;
 	
 	GtkWidget *alphaButtons[ALPHA_KEYS];
+
+	gchar* activeKey;
 };
 
 struct _KeyboardGTKClass
@@ -33,12 +33,9 @@ struct _KeyboardGTKClass
 	void (* keyboardGTK)(KeyboardGTK *kb);
 };
 
-guint 		keyboardGTK_get_type	(void);
+GType 		keyboardGTK_get_type	(void);
 GtkWidget* 	keyboardGTK_new			(void);
-void 		keyboardGTK_clear		(KeyboardGtk *kb);
-	
-#ifdef __cplusplus
-}
-#endif /*__cplusplus*/
+void 		keyboardGTK_clear		(KeyboardGTK *kb);
 
-#endif KeyboardGTK_h
+G_END_DECLS
+#endif /*KeyboardGTK_h*/
