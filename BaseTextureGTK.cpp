@@ -60,8 +60,6 @@ GtkWidget *BaseTextureGTK::convertOpenCv2Gtk(IplImage *img)
 
 void BaseTextureGTK::setImage(IplImage *img)
 {
-	if(gtk_img != NULL)
-		gtk_widget_destroy(gtk_img);
     image = cvCloneImage (img);
     gtk_img = convertOpenCv2Gtk(image);
 	gtk_box_pack_start( GTK_BOX(box), gtk_img, TRUE, TRUE, 0);

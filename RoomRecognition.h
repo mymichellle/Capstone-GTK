@@ -9,7 +9,7 @@
 #ifndef RoomRecognition_h
 #define RoomRecognition_h
 
-//#include "RoomTexture.h"
+#include "RoomTextureGTK.h"
 #include <cstdio>
 #include <string.h>
 #include "OpenSurf/surflib.h"
@@ -42,7 +42,7 @@ private:
     
 public:
     RoomRecognition(std::string roomsFile);
-    //void addRoom(RoomTexture *room);
+    void addRoom(RoomTextureGTK *room);
     
     std::string recognizeRoom(IplImage *image);
     

@@ -121,6 +121,8 @@ public:
     // Run the app
     void initProcess();
     void mainProcess();
+    //void addFace(FaceTextureGTK *face);
+    void addRoom(RoomTextureGTK *room);
     void updateEigenFaces();
     
     // Video controls

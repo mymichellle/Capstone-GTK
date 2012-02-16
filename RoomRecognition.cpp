@@ -9,6 +9,7 @@
 #include "RoomRecognition.h"
 #include "Pimp.h"
 #include <iostream>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -154,9 +155,9 @@ void RoomRecognition::loadRoomIpts(string file, string name)
     string dir = Pimp::sharedPimp().getDir()+ "/Rooms/" + name;
     
     // Make sure the directory exists
-   // int r = mkdir((char *)dir.c_str() , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    //if(r > 0)
-     //   cout<<"Directory not made! "<<dir<<endl;
+    int r = mkdir((char *)dir.c_str() , S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
+    if(r > 0)
+        cout<<"Directory not made! "<<dir<<endl;
    
     stringstream s;
     s << dir << "/"<< file <<".jpg";
@@ -206,7 +207,7 @@ Ipoint RoomRecognition::readPointFromStream(istream& s)
 }
 
 // Add a room image to the known rooms
-/*void RoomRecognition::addRoom(RoomTexture *room)
+void RoomRecognition::addRoom(RoomTextureGTK *room)
 {
     string tempName;
     string fileName;
@@ -260,7 +261,7 @@ Ipoint RoomRecognition::readPointFromStream(istream& s)
     fileNames.push_back(fileName);
     
     saveToXml();
-}*/
+}
 
 string RoomRecognition::recognizeRoom(IplImage *image)
 {

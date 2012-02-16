@@ -31,7 +31,7 @@ extern "C"{
 	
 	void RoomEntryPage_onNewImg(GtkWidget *btn, GtkWidget *label)
 	{
-		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(INIT_ROOM, gtk_label_get_text(GTK_LABEL(label))));
+		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(IMG_ROOM, gtk_label_get_text(GTK_LABEL(label))));
 	}
 
 	void RoomEntryPage_onGetImg(GtkWidget *btn, GtkWidget *dialog)
@@ -41,9 +41,13 @@ extern "C"{
 	
 	void RoomEntryPage_onAdd(GtkWidget *btn, RoomTextureGTK *roomtext)
 	{
-		// Add the image to known rooms
+		// Add the image to known rooms	
+		Pimp::sharedPimp().addRoom(roomtext);
 		// turn off camera
-		// go back to main page
+		Pimp::sharedPimp().videoOff();
+		// Exit to Main Page
+		Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
+	
 	}
 	
 	void RoomEntryPage_keyType(GtkWidget *keyboard, GtkWidget *dialog)
@@ -87,7 +91,7 @@ void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
 		dialog_name = gtk_entry_new();
 
 		// TakeImg - RoomEntryPage_onGetImg (Dialog)
-		btn_new = gtk_button_new_with_label("New Image");
+		btn_new = gtk_button_new_with_label("Get Image");
 		gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
 							GTK_SIGNAL_FUNC (RoomEntryPage_onGetImg), dialog_name);
 		gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
@@ -102,11 +106,12 @@ void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
 							GTK_SIGNAL_FUNC (RoomEntryPage_keyType), dialog_name);
 		gtk_box_pack_start(GTK_BOX(window), keyboard, TRUE,TRUE,0);
 
-		// Turn on the camera
-    	Pimp::sharedPimp().videoOn();
 	}
 	else if(mode == IMG_ROOM)
 	{
+		// Turn on the camera
+    	Pimp::sharedPimp().videoOn();
+
 		// label - rName
 		title = gtk_label_new((char*)rName.c_str());
 		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
@@ -115,6 +120,7 @@ void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
 		imgBox = gtk_hbox_new (TRUE,1);
 		gtk_box_pack_start( GTK_BOX(window), imgBox, TRUE, TRUE, 0);
 		room = new RoomTextureGTK(imgBox);
+		room->setName(rName);
 		
 		// hBox
 		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
@@ -139,7 +145,8 @@ void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
 		gtk_box_pack_start( GTK_BOX(hbox), btn_add, TRUE, TRUE, 0);
 		
 		// Get an image
-	   // Pimp::sharedPimp().getNewTexture(room);
+	    Pimp::sharedPimp().getNewTexture(room);
+		Pimp::sharedPimp().videoOff();
 	}
 }
 
