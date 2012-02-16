@@ -19,12 +19,13 @@
 #include "Eigenfaces.h"
 #include "RoomRecognition.h"
 #include "BaseTextureGTK.h"
+#include "RoomTextureGTK.h"
 
 /************    Debug enable triggers    *******************/
 #define DEBUG // Toggle all Debug code on
 #ifdef DEBUG
             
-            //#define SHOW_VIDEO // Show the live video stream
+            #define SHOW_VIDEO // Show the live video stream
 
 #endif
 /************************************************************/
@@ -120,6 +121,8 @@ public:
     // Run the app
     void initProcess();
     void mainProcess();
+    //void addFace(FaceTextureGTK *face);
+    void addRoom(RoomTextureGTK *room);
     void updateEigenFaces();
     
     // Video controls
@@ -131,6 +134,9 @@ public:
 
     void testProc();
     
+	// Room Texture
+	RoomTextureGTK *roomTexture;
+
     // Getters
     std::string getFaceDir(){return faceDir;};
     std::string getDir(){return dir;};

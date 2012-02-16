@@ -1,4 +1,6 @@
+#include <gtk/gtksignal.h>
 #include "KeyboardGTK.h"
+#include <iostream>
 
 #define TOP_ROW_COUNT 10
 #define MID_ROW_COUNT 19
@@ -10,72 +12,70 @@
 #define BACKSPACE_KEY 1
 #define CLOSE_KEY 2
 
+using namespace std;
+
 const char* enumText[] = { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Z", "X", "C", "V", "B", "N", "M", " ", "*"};
-
-
-guint keyboardGTK_get_type ()
-{
-	static guint kb_type = 0;
-	
-	if(!kb_type)
-	{
-		GtkTypeInfo kb_info = 
-		{
-			"KeyboardGTK",
-			sizeof (KeyboardGTK),
-			sizeof (KeyboardGTKClass),
-			(GtkClassInitFunc) keyboardGTK_class_init,
-			(GtkObjectInitFunc) keyboardGTK_init,
-			(GtkArgSetFunc) NULL,
-			(GtkArgGetFunc) NULL
-		};
-		
-		kb_type = gtk_type_unique (gtk_vbox_get_type (), &kb_info);
-	}
-	return kb_type;
-}
 
 enum {
 	KEYBOARDGTK_SIGNAL,
 	LAST_SIGNAL
 };
 
+static void keyboardGTK_class_init	(KeyboardGTKClass *klass);
+static void keyboardGTK_init		(KeyboardGTK *kb);
+static void alpha_clicked 			(GtkWidget *widget, KeyboardGTK *kb);
+
 static gint keyboardGTK_signals[LAST_SIGNAL] = {0};
 
-static void keyboardGTK_class_init (KeyboardGTKClass *class)
+GType keyboardGTK_get_type (void)
 {
-	GtkObjectClass *object_class;
+	static GType kb_type = 0;
 	
-	object_class = (GtkObjectClass*) class;
-	
-	keyboardGTK_signals[KEYBOARDGTK_SIGNAL] = gtk_signal_new ("keyboardGTK",
-															  GTK_RUN_FIRST,
-															  object_class->type,
-															  GTK_SIGNAL_OFFSET (KeyboardGTKClass, keyboardGTK),
-															  gtk_signal_default_marshaller, GTK_TYPE_NONE, 1,GTK_TYPE_CHAR);
-	
-	gtk_object_class_add_signals (object_class, keyboardGTK_signals, LAST_SIGNAL);
-	
-	class->keyboardGTK = NULL;
+	if(!kb_type)
+	{
+		const GTypeInfo kb_info = 
+		{
+			sizeof(KeyboardGTKClass),
+			NULL,
+			NULL,
+			(GClassInitFunc) keyboardGTK_class_init,
+			NULL,
+			NULL,
+			sizeof(KeyboardGTK),
+			0,
+			(GInstanceInitFunc) keyboardGTK_init,
+		};
+		
+		kb_type = g_type_register_static (GTK_TYPE_VBOX, "KeyboardGTK", &kb_info, GTypeFlags(0));
+	}
+	return kb_type;
+}
+
+static void keyboardGTK_class_init (KeyboardGTKClass *klass)
+{
+	keyboardGTK_signals[KEYBOARDGTK_SIGNAL] = g_signal_new ("keyboardGTK",
+                                           		G_TYPE_FROM_CLASS(klass),
+												G_SIGNAL_RUN_FIRST,
+												G_STRUCT_OFFSET (KeyboardGTKClass, keyboardGTK),
+												NULL,
+												NULL,
+												g_cclosure_marshal_VOID__VOID, 
+												G_TYPE_NONE, 
+												0);
 }
 
 static void keyboardGTK_init (KeyboardGTK *kb)
 {
-	GtkWidget *vbox;
 	gint i;
 	
-	hbox1 = gtk_hbox_new (TRUE,1);
-	hbox2 = gtk_hbox_new (TRUE,1);
-	hbox3 = gtk_hbox_new (TRUE,1);
+	GtkWidget *hbox1 = gtk_hbox_new (TRUE,1);
+	GtkWidget *hbox2 = gtk_hbox_new (TRUE,1);
+	GtkWidget *hbox3 = gtk_hbox_new (TRUE,1);
 	
 	gtk_box_pack_start( GTK_BOX(kb), hbox1, TRUE, TRUE, 0);
 	gtk_box_pack_start( GTK_BOX(kb), hbox2, TRUE, TRUE, 0);
 	gtk_box_pack_start( GTK_BOX(kb), hbox3, TRUE, TRUE, 0);
-	
-	gtk_widget_show (hbox1);
-	gtk_widget_show (hbox2);
-	gtk_widget_show (hbox3);
-	
+		
 	// Alpha keys
     for(int i = 0; i < ALPHA_KEYS; i++)
     {
@@ -90,14 +90,17 @@ static void keyboardGTK_init (KeyboardGTK *kb)
 			gtk_box_pack_start( GTK_BOX(hbox3), kb->alphaButtons[i], TRUE, TRUE, 0);
 		
 		// Attach a signal
-		gtk_signal_connect (GTK_OBJECT (kb->alphaButtons[i]), "clicked",
-							GTK_SIGNAL_FUNC (alpha_clicked), kb);
+		g_signal_connect (GTK_OBJECT (kb->alphaButtons[i]), "clicked",
+							G_CALLBACK (alpha_clicked),(gpointer) kb);
+
+		gtk_widget_show(kb->alphaButtons[i]);
     }
 }
 
+
 GtkWidget* keyboardGTK_new ()
 {
-	return GTK_WIDGET ( gtk_type_new (keyboardGTK_get_type ()));
+	return GTK_WIDGET ( g_object_new (keyboardGTK_get_type (), NULL));
 }
 
 void keyboardGTK_clear (KeyboardGTK *kb)
@@ -106,9 +109,13 @@ void keyboardGTK_clear (KeyboardGTK *kb)
 	
 	for (i=0;i<ALPHA_KEYS;i++)
 	{
-		gtk_signal_handler_block_by_data (GTK_OBJECT(kb->alphaButtons[i]), kb);
+		g_signal_handlers_block_matched (G_OBJECT (kb->alphaButtons[i]), 
+                                         G_SIGNAL_MATCH_DATA,
+                                         0, 0, NULL, NULL, kb);		
 		//gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (kb->alphaButtons[i]),FALSE);
-		gtk_signal_handler_unblock_by_data (GTK_OBJECT(kb->alphaButtons[i]), kb);
+		g_signal_handlers_unblock_matched (G_OBJECT (kb->alphaButtons[i]),
+                                           G_SIGNAL_MATCH_DATA,
+                                           0, 0, NULL, NULL, kb);
 	}
 }
 
@@ -120,10 +127,10 @@ static void alpha_clicked (GtkWidget *widget, KeyboardGTK *kb)
 	{
 		if(kb->alphaButtons[i] == widget)
 		{
+			kb->activeKey =const_cast <char*>(enumText[i]);
 			// emit the signal with the char pressed
-			gtk_signal_emit (GTK_OBJECT (kb),
-							 keyboardGTK_signals[KEYBOARDGTK_SIGNAL], 
-							 enumText[i]);
+			g_signal_emit ( kb,
+							keyboardGTK_signals[KEYBOARDGTK_SIGNAL], 0);
 			break;
 		}
 	}    

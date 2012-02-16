@@ -8,85 +8,150 @@
 
 #include "RoomEntryPageGTK.h"
 #include "MainPageGTK.h"
+#include "KeyboardGTK.h"
 #include <iostream>
 
+using namespace std;
+
 extern "C"{
-	// Goes back to main page
-	void RoomEntryPage_onBackPress()
+
+	void RoomEntryPage_onBackExit(GtkWidget *btn)
 	{
-		Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
+		// turn off camera
 		Pimp::sharedPimp().videoOff();
+		// Exit to Main Page
+		Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
 	}
-
-	// Add Face
-	void RoomEntryPage_onAddPress(RoomTextureGTK *roomTex)
-	{    
-		//room->setName(dialog_name->getValue());
-		//Pimp::sharedPimp().addRoom(room);
-	}
-
-	// Get new image
-	void RoomEntryPage_onNewPress(RoomTextureGTK *roomTex)
+	
+	void RoomEntryPage_onBackPage(GtkWidget *btn, GtkWidget *label)
 	{
-		//Pimp::sharedPimp().getNewTexture(roomTex);
+		// Go back to INIT_ROOM mode pass name from label
+		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(INIT_ROOM, gtk_label_get_text(GTK_LABEL(label))));
+	}
+	
+	void RoomEntryPage_onNewImg(GtkWidget *btn, GtkWidget *label)
+	{
+		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(IMG_ROOM, gtk_label_get_text(GTK_LABEL(label))));
+	}
+
+	void RoomEntryPage_onGetImg(GtkWidget *btn, GtkWidget *dialog)
+	{	
+		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(IMG_ROOM, gtk_entry_get_text((GtkEntry*)dialog)));
+	}
+	
+	void RoomEntryPage_onAdd(GtkWidget *btn, RoomTextureGTK *roomtext)
+	{
+		// Add the image to known rooms	
+		Pimp::sharedPimp().addRoom(roomtext);
+		// turn off camera
+		Pimp::sharedPimp().videoOff();
+		// Exit to Main Page
+		Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
+	
+	}
+	
+	void RoomEntryPage_keyType(GtkWidget *keyboard, GtkWidget *dialog)
+	{
+		gtk_entry_append_text((GtkEntry*)dialog, ((KeyboardGTK*)keyboard)->activeKey);
 	}
 }
 
 RoomEntryPageGTK::RoomEntryPageGTK()
 {
+	initPage(INIT_ROOM, "");
+}
+
+
+RoomEntryPageGTK::RoomEntryPageGTK(enum RoomEntryMode mode, std::string rName)
+{
+	initPage(mode, rName);
+}
+
+void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
+{
     // Window box to contain this page
-    window = gtk_vbox_new (FALSE,1);  
+    window = gtk_vbox_new (FALSE,1); 
 
-	// Title
-    title = gtk_label_new("Add A Room");
-    gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
+	if(mode == INIT_ROOM)
+	{
+		// label - "Room Entry"
+		title = gtk_label_new("Room Entry");
+		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
+		
+		// hBox
+		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
 
-	// Image
-	imgBox = gtk_hbox_new (TRUE,1);
-	gtk_box_pack_start( GTK_BOX(window), imgBox, TRUE, TRUE, 0);
-    room = new RoomTextureGTK(imgBox);
+		// Back - RoomEntryPage_onBackExit
+		btn_back = gtk_button_new_with_label ("Back");
+		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+		                    GTK_SIGNAL_FUNC (RoomEntryPage_onBackExit), NULL);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
 
-	// Buttons
-	GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
-	gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
-    btn_new = gtk_button_new_with_label("New Image");
-	gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
-						GTK_SIGNAL_FUNC (RoomEntryPage_onNewPress), room);
-	gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
+		dialog_name = gtk_entry_new();
 
-    btn_add = gtk_button_new_with_label("Add");
-	gtk_signal_connect (GTK_OBJECT (btn_add), "clicked",
-						GTK_SIGNAL_FUNC (RoomEntryPage_onAddPress), room);
-	gtk_box_pack_start( GTK_BOX(hbox), btn_add, TRUE, TRUE, 0);
+		// TakeImg - RoomEntryPage_onGetImg (Dialog)
+		btn_new = gtk_button_new_with_label("Get Image");
+		gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
+							GTK_SIGNAL_FUNC (RoomEntryPage_onGetImg), dialog_name);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
+		
+		// Dialog - rName
+		gtk_entry_set_text((GtkEntry*)dialog_name, (char*)rName.c_str());
+		gtk_box_pack_start( GTK_BOX(window), dialog_name, TRUE, TRUE, 0);
+		
+		// Keyboard - RoomEntryPage_keyType (dialog)
+		keyboard = keyboardGTK_new();
+		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK",
+							GTK_SIGNAL_FUNC (RoomEntryPage_keyType), dialog_name);
+		gtk_box_pack_start(GTK_BOX(window), keyboard, TRUE,TRUE,0);
 
-    btn_back = gtk_button_new_with_label ("Back");
-    gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
-                        GTK_SIGNAL_FUNC (RoomEntryPage_onBackPress), NULL);
-    gtk_box_pack_start( GTK_BOX(window), btn_back, TRUE, TRUE, 0);
+	}
+	else if(mode == IMG_ROOM)
+	{
+		// Turn on the camera
+    	Pimp::sharedPimp().videoOn();
 
+		// label - rName
+		title = gtk_label_new((char*)rName.c_str());
+		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
+		// img
+		imgBox = gtk_hbox_new (TRUE,1);
+		gtk_box_pack_start( GTK_BOX(window), imgBox, TRUE, TRUE, 0);
+		room = new RoomTextureGTK(imgBox);
+		room->setName(rName);
+		
+		// hBox
+		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
 
-    //dialog_name = new BaseDialog("Name: ", "Unknown", WINDOW_WIDTH/2, WINDOW_HEIGHT/4, 100);
-    
-    
-	// Turn on the camera and take an image
-    Pimp::sharedPimp().videoOn();
-    Pimp::sharedPimp().getNewTexture(room);
+		// Back - RoomEntryPage_onBackPage (label)
+		btn_back = gtk_button_new_with_label ("Back");
+		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+		                    GTK_SIGNAL_FUNC (RoomEntryPage_onBackPage), title);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
+
+		// NewImg - RoomEntryPage_onNewImg (label)
+		btn_new = gtk_button_new_with_label("New Image");
+		gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
+							GTK_SIGNAL_FUNC (RoomEntryPage_onNewImg), title);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
+
+		// Add - RoomEntryPage_onAdd (img)
+		btn_add = gtk_button_new_with_label("Add");
+		gtk_signal_connect (GTK_OBJECT (btn_add), "clicked",
+							GTK_SIGNAL_FUNC (RoomEntryPage_onAdd), room);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_add, TRUE, TRUE, 0);
+		
+		// Get an image
+	    Pimp::sharedPimp().getNewTexture(room);
+		Pimp::sharedPimp().videoOff();
+	}
 }
 
 // Display
 void RoomEntryPageGTK::display()
 {   
-    // Draw the title
-    gtk_widget_show (title);
-
-    // Draw the buttons and dialogs
-    gtk_widget_show (btn_back);
-    gtk_widget_show (btn_add);
-    gtk_widget_show (btn_new);
-    //gtk_widget_show (dialog_name->draw();
-    
-    // Draw the room image
-    //room->draw();
     
 }

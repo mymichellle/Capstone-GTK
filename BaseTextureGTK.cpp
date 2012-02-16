@@ -43,7 +43,7 @@ GtkWidget *BaseTextureGTK::convertOpenCv2Gtk(IplImage *img)
 	// make the gtk image 160x120
 	IplImage *gtkMask = cvCreateImage(cvSize (160, 120), IPL_DEPTH_8U, 3);
 	cvResize(img, gtkMask,CV_INTER_LINEAR);
-	//cvCvtColor( img, gtkMask, CV_BGR2RGB ); // Usually opencv image is BGR, so we need to change it to RGB 
+	cvCvtColor( gtkMask, gtkMask, CV_BGR2RGB ); // Usually opencv image is BGR, so we need to change it to RGB 
 	GdkPixbuf *pix = gdk_pixbuf_new_from_data ((guchar*)gtkMask->imageData, 
 		GDK_COLORSPACE_RGB, 
 		FALSE, 
@@ -60,11 +60,6 @@ GtkWidget *BaseTextureGTK::convertOpenCv2Gtk(IplImage *img)
 
 void BaseTextureGTK::setImage(IplImage *img)
 {
-	// Remove any existing children from the image box
-	GList *children = gtk_container_get_children(GTK_CONTAINER(box));
-	for(int i = 0; i < g_list_length(children); i++)
-		gtk_container_remove(GTK_CONTAINER(box), (GtkWidget*) g_list_nth_data(children, i));
-
     image = cvCloneImage (img);
     gtk_img = convertOpenCv2Gtk(image);
 	gtk_box_pack_start( GTK_BOX(box), gtk_img, TRUE, TRUE, 0);

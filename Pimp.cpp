@@ -27,6 +27,7 @@ using namespace std;
 extern "C"{
     void pimp_destroy(void)
     {
+		//Pimp::sharedPimp().videoOff();
         gtk_main_quit ();
     }
 }
@@ -71,13 +72,14 @@ void Pimp::startupProcess()
     // Video Capture
     video = new VideoStream();
     current_frame = NULL;
+	//videoOn();
     
     // Face Recognition
    // fisherfaces = new Fisherfaces(faceDir+"NewFaceSet");
     eigenfaces = new Eigenfaces(faceDir+"NewFaceSet");
     
     // Room Recognition
-    roomRec = new RoomRecognition(roomDir+"PimpRooms");
+    roomRec = new RoomRecognition(roomDir+"NewRooms");
     
     // State Variables
     currentMode = RECOGNITION;
@@ -114,11 +116,13 @@ void Pimp::draw()
 
 // Turn the video stream on
 void Pimp::videoOn(){
+cout<<"VIDEO ON!"<<endl;
     video->startCapture();
 }
 
 // Turn the video stream off
 void Pimp::videoOff(){
+cout<<"VIDEO OFF!"<<endl;
     video->endCapture();
 }
 
@@ -127,13 +131,29 @@ void Pimp::updateEigenFaces(){
     eigenfaces->update();
 }
 
+// add new room
+void Pimp::addRoom(RoomTextureGTK *room){
+    roomRec->addRoom(room);
+}
 
 void Pimp::getNewTexture(BaseTextureGTK *tex){
     // Create a new face texture
+	cout<<"GetNewTexture"<<endl;
     current_frame = video->getImage();
-    display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
-    cvFlip (current_frame, display_frame, 1);
-    tex->setImage(display_frame);
+		cout<<"GetNewTexture1"<<endl;
+	if( current_frame != NULL )
+	{
+		cout<<"GetNewTexture2"<<endl;
+		display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
+
+		cout<<"GetNewTexture3"<<endl;		
+cvFlip (current_frame, display_frame, 1);
+		cout<<"GetNewTexture4"<<endl;
+		tex->setImage(display_frame);
+		cout<<"GetNewTexture5"<<endl;
+	}
+	else
+		cout<<"ERROR: getNewTexture - no current frame"<<endl;
 }
 
 // Set the Recognition Mode
@@ -203,9 +223,9 @@ void Pimp::mainProcess()
     current_frame = video->getImage();
     // set display_frame to flipped current_frame
     cvFlip (current_frame, display_frame, 1);
-    /*
+    
     // Face Recognition
-    if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
+    /*if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
     {
         faceRecognition();
         lastFaceCycle = cycleNum;
