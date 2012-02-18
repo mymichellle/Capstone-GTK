@@ -61,6 +61,17 @@ extern "C"{
 		gtk_entry_append_text((GtkEntry*)dialog, ((KeyboardGTK*)keyboard)->activeKey);
 	}
 
+	void FaceEntryPage_keyDelete(GtkWidget *keyboard, GtkWidget *dialog)
+	{
+		int len = gtk_entry_get_text_length((GtkEntry*)dialog);
+		if(len >= 1)
+		{
+			string text = gtk_entry_get_text((GtkEntry*)dialog);
+	        text.erase(len-1);
+			gtk_entry_set_text((GtkEntry*)dialog,(char*)text.c_str());
+		}
+	}
+
 	// Get new image
 	void FaceEntryPage_onNewPress()
 	{
@@ -147,6 +158,8 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		keyboard = keyboardGTK_new();
 		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK",
 							GTK_SIGNAL_FUNC (FaceEntryPage_keyType), dialog_name);
+		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK_delete",
+							GTK_SIGNAL_FUNC (FaceEntryPage_keyDelete), dialog_name);
 		gtk_box_pack_start(GTK_BOX(window), keyboard, TRUE,TRUE,0);
 	}
 	else if(mode == FACE_ACCEPTANCE)

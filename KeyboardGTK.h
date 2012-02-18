@@ -22,6 +22,7 @@ struct _KeyboardGTK
 	GtkVBox vbox;
 	
 	GtkWidget *alphaButtons[ALPHA_KEYS];
+	GtkWidget *deleteButton;
 
 	gchar* activeKey;
 };

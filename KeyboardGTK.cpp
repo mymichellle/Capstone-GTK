@@ -18,12 +18,14 @@ const char* enumText[] = { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "A"
 
 enum {
 	KEYBOARDGTK_SIGNAL,
+	DELETE_SIGNAL,
 	LAST_SIGNAL
 };
 
 static void keyboardGTK_class_init	(KeyboardGTKClass *klass);
 static void keyboardGTK_init		(KeyboardGTK *kb);
 static void alpha_clicked 			(GtkWidget *widget, KeyboardGTK *kb);
+static void delete_clicked			(GtkWidget *widget, KeyboardGTK *kb);
 
 static gint keyboardGTK_signals[LAST_SIGNAL] = {0};
 
@@ -54,6 +56,15 @@ GType keyboardGTK_get_type (void)
 static void keyboardGTK_class_init (KeyboardGTKClass *klass)
 {
 	keyboardGTK_signals[KEYBOARDGTK_SIGNAL] = g_signal_new ("keyboardGTK",
+                                           		G_TYPE_FROM_CLASS(klass),
+												G_SIGNAL_RUN_FIRST,
+												G_STRUCT_OFFSET (KeyboardGTKClass, keyboardGTK),
+												NULL,
+												NULL,
+												g_cclosure_marshal_VOID__VOID, 
+												G_TYPE_NONE, 
+												0);
+	keyboardGTK_signals[DELETE_SIGNAL] = g_signal_new ("keyboardGTK_delete",
                                            		G_TYPE_FROM_CLASS(klass),
 												G_SIGNAL_RUN_FIRST,
 												G_STRUCT_OFFSET (KeyboardGTKClass, keyboardGTK),
@@ -95,6 +106,11 @@ static void keyboardGTK_init (KeyboardGTK *kb)
 
 		gtk_widget_show(kb->alphaButtons[i]);
     }
+
+	kb->deleteButton = gtk_button_new_with_label("<--");
+	gtk_box_pack_start( GTK_BOX(hbox3), kb->deleteButton, TRUE, TRUE, 0);
+	g_signal_connect(GTK_OBJECT(kb->deleteButton), "clicked",
+						G_CALLBACK (delete_clicked),(gpointer)kb);
 }
 
 
@@ -123,6 +139,14 @@ static void alpha_clicked (GtkWidget *widget, KeyboardGTK *kb)
 {
 	int i;
 	
+	if(kb->deleteButton == widget)
+	{
+		kb->activeKey = const_cast <char*>(enumText[ALPHA_KEYS+1]);
+		g_signal_emit ( kb,
+						keyboardGTK_signals[KEYBOARDGTK_SIGNAL], 0);
+		return;
+	}
+
 	for (i=0;i<ALPHA_KEYS;i++)
 	{
 		if(kb->alphaButtons[i] == widget)
@@ -134,4 +158,11 @@ static void alpha_clicked (GtkWidget *widget, KeyboardGTK *kb)
 			break;
 		}
 	}    
+}
+
+static void delete_clicked (GtkWidget *widget, KeyboardGTK *kb)
+{
+	g_signal_emit ( kb,
+					keyboardGTK_signals[DELETE_SIGNAL], 0);
+	    
 }
