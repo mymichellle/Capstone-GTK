@@ -12,8 +12,8 @@
 #include "SettingsPageGTK.h"
 #include "DisplayPageGTK.h"
 #include "RoomEntryPageGTK.h"
-/*#include "FaceEntryPage.h"
-#include "FaceTexture.h"*/
+#include "FaceEntryPageGTK.h"
+#include "FaceTextureGTK.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,8 +26,7 @@ extern "C"{
     // Goes to the add a face page
     void MainPage_onNewFacePress()
     {
-        // Pimp::sharedPimp().setDisplayPage(new FaceEntryPage());
-        g_print ("MainPage-face\n");
+        Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK());
     }
     
     // Goes to the add a face page

@@ -15,7 +15,7 @@
 #include <cstring>
 #include <string>
 
-//#include "FaceTexture.h"
+#include "FaceTextureGTK.h"
 
 class Eigenfaces
 {
@@ -60,7 +60,7 @@ public:
     void learn(char * filename);
     void update();
     std::string recognizeFace(IplImage* preProcessedFace);
-    //void addFace(FaceTexture *face);
+    void addFace(FaceTextureGTK *face);
 };
 
 #endif

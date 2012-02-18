@@ -6,72 +6,55 @@
 //  Copyright 2011 ??? . All rights reserved.
 //
 
-#ifndef FaceEntryPage_h
-#define FaceEntryPage_h
+#ifndef FaceEntryPageGTK_h
+#define FaceEntryPageGTK_h
 
-#include "BasePage.h"
-#include "BaseButton.h"
-#include "BaseDialog.h"
-#include "BaseKeyboard.h"
-#include "FaceTexture.h"
+#include "FaceTextureGTK.h"
 #include "Pimp.h"
 #include <string>
-#ifdef __APPLE__
-#include <GL/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include <gtk/gtk.h>
 
 #define NUM_FACES 10
 
-class FaceEntryPage : public BasePage
-{
-private:
-    // States
-    enum Mode{
+enum FaceEntryMode{
         NAME_ENTRY,
         FACE_RETRIEVAL,
         FACE_ACCEPTANCE
     };
-    enum Mode currentMode;
-    
+
+class FaceEntryPageGTK : public BasePageGTK
+{
+private:    
+	// Initialize function
+	void initPage(enum FaceEntryMode mode, std::string rName);
+
     // Title
-    std::string title;
+    GtkWidget *title;
     
     // Buttons
-    BaseButton *btn_back;
-    BaseButton *btn_add;
-    BaseButton *btn_new;
-    BaseButton *btn_next;
+    GtkWidget *btn_back;
+    GtkWidget *btn_add;
+    GtkWidget *btn_new;
+    GtkWidget *btn_next;
     
     // Dialog
-    BaseDialog *dialog_name;
+    GtkWidget *dialog_name;
     
     // Keyboard
-    BaseKeyboard *alphaKeys;
+    GtkWidget *keyboard;
     
     // Properties
     std::string *name;
-    
-    // Callbacks
-    void onAddPress();
-    void onNextPress();
-    void onBackPress();
-    void onNewPress();
-    void onVirtualKeyboard();
-    
+        
     // Face Textures
     //FaceTexture* face[NUM_FACES];
-    std::vector<FaceTexture*> face;
+    std::vector<FaceTextureGTK*> face;
     
     void cleanUp();
     
 public:
-    FaceEntryPage();
-    
-    // User input
-    void mouse(int button, int state, int x, int y);
-    void keyboard(unsigned char key, int x, int y);
+	FaceEntryPageGTK();
+    FaceEntryPageGTK(enum FaceEntryMode mode, std::string rName);
     
     // Display
     void display();

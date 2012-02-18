@@ -6,20 +6,15 @@
 //  Copyright 2011 ??? . All rights reserved.
 //
 
-#ifndef FaceTexture_h
-#define FaceTexture_h
+#ifndef FaceTextureGTK_h
+#define FaceTextureGTK_h
 
-#include "BaseTexture.h"
+#include "BaseTextureGTK.h"
 
-#ifdef __APPLE__
-#include <GL/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
 #include <cv.h>
 #include <string>
 
-class FaceTexture: public BaseTexture
+class FaceTextureGTK: public BaseTextureGTK
 {
 private:
     // Processed Image and display area
@@ -27,23 +22,18 @@ private:
     CvRect displayRegion;
     CvRect wholeRegion;
     
-    // Dimensions / Locations
-    int xpos;
-    int ypos;
+    // Dimensions
     int width;
     int height;
     
     bool invalid;
     
-    // Helper Function
-    bool pointInBounds(int x,int y);
     
 public:
-    FaceTexture(int x, int y, int w, int h);
+    FaceTextureGTK(GtkWidget *holder, int d);
     
     // Display Function
     void draw();
-    bool mouse(int button, int state, int x, int y);
     
     // Getters and Setters
     void setFace(IplImage *img, IplImage *proc, CvRect r);

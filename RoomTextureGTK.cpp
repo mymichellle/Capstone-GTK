@@ -8,6 +8,7 @@
 
 #include "RoomTextureGTK.h"
 #include "Pimp.h"
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -41,9 +42,9 @@ void RoomTextureGTK::saveRoomAsJPG(string file)
     string dir = Pimp::sharedPimp().getDir()+ "/Rooms/" + name;
     
     // Make sure the directory exists
-    //int r = mkdir((char *)dir.c_str() , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    //if(r > 0)
-    //    cout<<"Directory not made! "<<dir<<endl;
+    int r = mkdir((char *)dir.c_str() , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if(r > 0)
+        cout<<"Directory not made! "<<dir<<endl;
     
     // Save the image
     if(image)

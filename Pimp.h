@@ -20,6 +20,7 @@
 #include "RoomRecognition.h"
 #include "BaseTextureGTK.h"
 #include "RoomTextureGTK.h"
+#include "FaceTextureGTK.h"
 
 /************    Debug enable triggers    *******************/
 #define DEBUG // Toggle all Debug code on
@@ -121,7 +122,7 @@ public:
     // Run the app
     void initProcess();
     void mainProcess();
-    //void addFace(FaceTextureGTK *face);
+    void addFace(FaceTextureGTK *face);
     void addRoom(RoomTextureGTK *room);
     void updateEigenFaces();
     
@@ -129,7 +130,8 @@ public:
     void videoOn();
     void videoOff();
     
-	// helper functions
+	// Helper Function
+    void getNewFaceTextures(std::vector<FaceTextureGTK*> faceText);
 	void getNewTexture(BaseTextureGTK *tex);
 
     void testProc();

@@ -131,6 +131,12 @@ void Pimp::updateEigenFaces(){
     eigenfaces->update();
 }
 
+// add new face
+void Pimp::addFace(FaceTextureGTK *face)
+{
+    eigenfaces->addFace(face);
+}
+
 // add new room
 void Pimp::addRoom(RoomTextureGTK *room){
     roomRec->addRoom(room);
@@ -156,6 +162,31 @@ cvFlip (current_frame, display_frame, 1);
 		cout<<"ERROR: getNewTexture - no current frame"<<endl;
 }
 
+void Pimp::getNewFaceTextures(vector<FaceTextureGTK*> faceText)
+{    
+    int maxFaces = faceText.size();
+    cout<<"Number of faces "<<maxFaces<<endl;
+    for(int i = 0; i < maxFaces; i++)
+    {
+        // Create a new face texture
+        current_frame = video->getImage();
+        display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
+        initFaceRecognition();
+        cvFlip (current_frame, display_frame, 1);
+        
+        // Get the largest face in the frame
+        CvRect r = cvRect(0,0,0,0);
+        r = faces->getFace(current_frame, r);
+        
+        cvSetImageROI(display_frame,r);
+        processed_face = facePreProcess->preProcess(display_frame);
+        cvResetImageROI(display_frame);
+        
+        // Save the processed face to the FaceTexture
+        faceText[i]->setFace(display_frame, processed_face, r);
+    }
+    
+}
 // Set the Recognition Mode
 void Pimp::setMode(bool faceRecOn, int faceRecRate, bool roomRecOn, int roomRecRate)
 {
@@ -225,18 +256,18 @@ void Pimp::mainProcess()
     cvFlip (current_frame, display_frame, 1);
     
     // Face Recognition
-    /*if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
+    if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
     {
         faceRecognition();
         lastFaceCycle = cycleNum;
-    }*/
+    }
     
     // Room Recognition
-    if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
+    /*if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
     {
         roomRecognition();
         lastRoomCycle = cycleNum;
-    }
+    }*/
     
     
 #ifdef SHOW_VIDEO

@@ -22,7 +22,7 @@ protected:
     
     // Texture
 	GtkWidget* gtk_img;
-	GtkWidget* convertOpenCv2Gtk(IplImage *image);
+	GtkWidget* convertOpenCv2Gtk(IplImage *image, int w, int h);
     void setTexture();
     
     // Image and display area

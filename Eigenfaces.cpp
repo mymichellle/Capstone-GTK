@@ -481,7 +481,7 @@ std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
         return "NO_CONFIDENCE";
 }
 
-/*void Eigenfaces::addFace(FaceTexture *face)
+void Eigenfaces::addFace(FaceTextureGTK *face)
 {
     // Find the people with the same name
     bool found = false;
@@ -530,7 +530,7 @@ std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
     
     // Create new text file discribing where saved images are
     createTextFile();
-}*/
+}
 
 // Create a text file of the known faces discribing where the images are saved
 void Eigenfaces::createTextFile()

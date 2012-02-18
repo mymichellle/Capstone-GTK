@@ -6,239 +6,240 @@
 //  Copyright 2011 ??? . All rights reserved.
 //
 
-#include "FaceEntryPage.h"
-#include "MainPage.h"
-#ifdef __APPLE__
-#include <GL/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include "FaceEntryPageGTK.h"
+#include "MainPageGTK.h"
+#include "KeyboardGTK.h"
 #include <iostream>
 
 using namespace std;
 
-FaceEntryPage::FaceEntryPage()
-{
-    // Begin in Name Entry mode
-    currentMode = NAME_ENTRY;
-    
-    // Initialize the buttons
-    btn_back = new BaseButton("Back", 75, WINDOW_HEIGHT-50,100,50);
-    btn_next = new BaseButton("Next", WINDOW_WIDTH-75, WINDOW_HEIGHT-50,100,50);
-    btn_next->setDisabled(true);
-    btn_new = new BaseButton("More", WINDOW_WIDTH/2, WINDOW_HEIGHT - 50,100,50);
-    btn_add = new BaseButton("Done", WINDOW_WIDTH-75, WINDOW_HEIGHT-50,100,50);
-    dialog_name = new BaseDialog("Name: ", "", WINDOW_WIDTH/2, WINDOW_HEIGHT-150, 100);
-    alphaKeys = new BaseKeyboard(false);//Do not include a close button
-    alphaKeys->setActive(true);
-    
-    // Initialize the vector of face textures
-    face.clear();
-    int faceImgDim = 80;
-    int xpos = faceImgDim/2;
-    int ypos = faceImgDim/2;
-    for(int i = 0; i < NUM_FACES; i++)
-    {
-        if(i == 5)
-        {
-            ypos += faceImgDim;
-            xpos = faceImgDim/2;
-        }
-        face.push_back(new FaceTexture(xpos, ypos,faceImgDim,faceImgDim));
-        xpos +=faceImgDim;
-    }
-    
-    // Turn on the camera
-    Pimp::sharedPimp().videoOn();
+extern "C"{
+	// Goes back to main page
+	void FaceEntryPage_onBackExit()
+	{
+		    Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
+		    //cleanUp();
+		    Pimp::sharedPimp().videoOff();
+	}
+
+	void FaceEntryPage_onBackPage(GtkWidget *btn, GtkWidget *label)
+	{
+		// Go back to INIT_ROOM mode pass name from label
+		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(NAME_ENTRY, gtk_label_get_text(GTK_LABEL(label))));
+	}
+
+	void FaceEntryPage_onGetImg(GtkWidget *btn, GtkWidget *dialog)
+	{	
+		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(FACE_ACCEPTANCE, gtk_entry_get_text((GtkEntry*)dialog)));
+	}
+
+	void FaceEntryPage_onNewImg(GtkWidget *btn, GtkWidget *label)
+	{
+		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(FACE_ACCEPTANCE, gtk_label_get_text(GTK_LABEL(label))));
+	}
+
+	void FaceEntryPage_onAdd(GtkWidget *btn, vector<FaceTextureGTK*> facetext)
+	{
+		// Add the images to known faces	
+		for(int i = 0; i < NUM_FACES; i++)
+		{
+		    Pimp::sharedPimp().addFace(facetext[i]);
+		}
+
+		// turn off camera
+		Pimp::sharedPimp().videoOff();
+		// Exit to Main Page
+		Pimp::sharedPimp().setDisplayPage(new MainPageGTK());		
+	
+		// Update known faces
+		Pimp::sharedPimp().updateEigenFaces();
+	}
+
+	// Handles Keyboard events
+	void FaceEntryPage_keyType(GtkWidget *keyboard, GtkWidget *dialog)
+	{
+		gtk_entry_append_text((GtkEntry*)dialog, ((KeyboardGTK*)keyboard)->activeKey);
+	}
+
+	// Add Faces and return to main page
+	void FaceEntryPage_onAddPress()
+	{
+		// Add Faces
+		/*for(int i = 0; i < NUM_FACES; i++)
+		{
+		    face[i]->setName(dialog_name->getValue());
+		    Pimp::sharedPimp().addFace(face[i]);
+		}
+		
+		// Return to main page
+		Pimp::sharedPimp().setDisplayPage(new MainPage());
+		cleanUp();
+		Pimp::sharedPimp().videoOff();
+		
+		// Update known faces
+		Pimp::sharedPimp().updateEigenFaces();*/
+	}
+
+	// Progress to the next mode
+	void FaceEntryPage_onNextPress()
+	{
+		/*currentMode = FACE_RETRIEVAL;
+		glutPostRedisplay();
+		// Capture faces
+		Pimp::sharedPimp().getNewFaceTextures(face);
+		currentMode = FACE_ACCEPTANCE;
+		glutPostRedisplay();*/
+	}
+
+	// Get new image
+	void FaceEntryPage_onNewPress()
+	{
+		// Create a new faceTexture vector of invalid faces
+	/*	vector<FaceTexture*> invalidFaces;
+		int numInvalid = 0;
+		for(int i = 0; i < NUM_FACES; i++)
+		{
+		    if(face[i]->isInvalid())
+		    {
+		        face[i]->setInvalid(false);
+		        invalidFaces.push_back(face[i]);
+		    }
+		}
+		
+		// Get more face textures to replace invalid ones
+		Pimp::sharedPimp().getNewFaceTextures(invalidFaces);
+		
+		int sizeNewFaces = invalidFaces.size();
+		int newFacePos = 0;
+		
+		// Replace the invalid faces with the new ones
+		for(int i = 0; i < numInvalid; i++)
+		{
+		    if(face[i]->isInvalid() && newFacePos<sizeNewFaces)
+		    {
+		        cout<<"Replacing and setting valid"<<endl;
+		        face[i] = invalidFaces[newFacePos];
+		        face[i]->setInvalid(false);
+		        newFacePos++;
+		    }
+		}
+		
+		invalidFaces.clear();
+		// Redraw
+		glutPostRedisplay();*/
+	}
 }
 
-// Goes back to main page
-void FaceEntryPage::onBackPress()
+FaceEntryPageGTK::FaceEntryPageGTK()
 {
-    if(currentMode == NAME_ENTRY)
-    {
-        Pimp::sharedPimp().setDisplayPage(new MainPage());
-        cleanUp();
-        Pimp::sharedPimp().videoOff();
-    }
-    else if(currentMode == FACE_ACCEPTANCE)
-    {
-        currentMode = NAME_ENTRY;
-        glutPostRedisplay();
-    }
+	initPage(NAME_ENTRY, "");
 }
 
-// Add Faces and return to main page
-void FaceEntryPage::onAddPress()
+FaceEntryPageGTK::FaceEntryPageGTK(enum FaceEntryMode mode, std::string rName)
 {
-    // Add Faces
-    for(int i = 0; i < NUM_FACES; i++)
-    {
-        face[i]->setName(dialog_name->getValue());
-        Pimp::sharedPimp().addFace(face[i]);
-    }
-    
-    // Return to main page
-    Pimp::sharedPimp().setDisplayPage(new MainPage());
-    cleanUp();
-    Pimp::sharedPimp().videoOff();
-    
-    // Update known faces
-    Pimp::sharedPimp().updateEigenFaces();
+	initPage(mode, rName);
 }
 
-// Progress to the next mode
-void FaceEntryPage::onNextPress()
+void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 {
-    currentMode = FACE_RETRIEVAL;
-    glutPostRedisplay();
-    // Capture faces
-    Pimp::sharedPimp().getNewFaceTextures(face);
-    currentMode = FACE_ACCEPTANCE;
-    glutPostRedisplay();
-}
+    // Window box to contain this page
+    window = gtk_vbox_new (FALSE,1); 
 
-// Get new image
-void FaceEntryPage::onNewPress()
-{
-    // Create a new faceTexture vector of invalid faces
-    vector<FaceTexture*> invalidFaces;
-    int numInvalid = 0;
-    for(int i = 0; i < NUM_FACES; i++)
-    {
-        if(face[i]->isInvalid())
-        {
-            face[i]->setInvalid(false);
-            invalidFaces.push_back(face[i]);
-        }
-    }
-    
-    // Get more face textures to replace invalid ones
-    Pimp::sharedPimp().getNewFaceTextures(invalidFaces);
-    
-    int sizeNewFaces = invalidFaces.size();
-    int newFacePos = 0;
-    
-    // Replace the invalid faces with the new ones
-    for(int i = 0; i < numInvalid; i++)
-    {
-        if(face[i]->isInvalid() && newFacePos<sizeNewFaces)
-        {
-            cout<<"Replacing and setting valid"<<endl;
-            face[i] = invalidFaces[newFacePos];
-            face[i]->setInvalid(false);
-            newFacePos++;
-        }
-    }
-    
-    invalidFaces.clear();
-    // Redraw
-    glutPostRedisplay();
-}
+    if(mode == NAME_ENTRY)
+	{
+		// label - "Room Entry"
+		title = gtk_label_new("Face Entry");
+		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
-// Handles mouse events
-void FaceEntryPage::mouse(int button, int state, int x, int y)
-{
-    // Check for button/dialog/keyboard presses
-    if(currentMode == NAME_ENTRY)
-    {
-        if(btn_next->mouse(button, state, x, y))
-            onNextPress();
-        else if(dialog_name->mouse(button,state, x, y))
-            alphaKeys->setActive(true);
-        else if(alphaKeys->mouse(button, state,x, y))
-            onVirtualKeyboard();
-        
-        if(btn_back->mouse(button, state, x, y))
-            onBackPress();
-    }
-    else if(currentMode == FACE_ACCEPTANCE)
-    {
-        if(btn_add->mouse(button, state, x, y))
-            onAddPress();
-        else if(btn_new->mouse(button, state, x, y))
-            onNewPress();
-        else
-        {
-            for(int i = 0; i < NUM_FACES; i++)
-            {
-                if(face[i]->mouse(button, state, x, y))
-                {
-                    face[i]->setInvalid(!face[i]->isInvalid());
-                    break;
-                }
-            }
-        }
-        
-        if(btn_back->mouse(button, state, x, y))
-            onBackPress();
-    }
-    
-}
+		// hBox
+		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
 
-// Handles Keyboard events
-void FaceEntryPage::keyboard(unsigned char key, int x, int y)
-{
-    if(currentMode == NAME_ENTRY)
-        dialog_name->keyboard(key, x, y);
-}
+		// Back - RoomEntryPage_onBackExit
+		btn_back = gtk_button_new_with_label ("Back");
+		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onBackExit), NULL);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
 
-void FaceEntryPage::onVirtualKeyboard()
-{
-    if(currentMode == NAME_ENTRY)
-        dialog_name->addChar(alphaKeys->getActiveKey());
+		dialog_name = gtk_entry_new();
+
+		// TakeImg - RoomEntryPage_onGetImg (Dialog)
+		btn_next = gtk_button_new_with_label("Get Image");
+		gtk_signal_connect (GTK_OBJECT (btn_next), "clicked",
+							GTK_SIGNAL_FUNC (FaceEntryPage_onGetImg), dialog_name);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_next, TRUE, TRUE, 0);
+		
+		// Dialog - rName
+		gtk_entry_set_text((GtkEntry*)dialog_name, (char*)rName.c_str());
+		gtk_box_pack_start( GTK_BOX(window), dialog_name, TRUE, TRUE, 0);
+		
+		// Keyboard - RoomEntryPage_keyType (dialog)
+		keyboard = keyboardGTK_new();
+		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK",
+							GTK_SIGNAL_FUNC (FaceEntryPage_keyType), dialog_name);
+		gtk_box_pack_start(GTK_BOX(window), keyboard, TRUE,TRUE,0);
+	}
+	else if(mode == FACE_ACCEPTANCE)
+	{
+		// Turn on the camera
+    	Pimp::sharedPimp().videoOn();
+
+		// label - rName
+		title = gtk_label_new((char*)rName.c_str());
+		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
+
+		// hBox
+		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
+
+		// Initialize the vector of face textures
+		face.clear();
+		int faceImgDim = 60;
+		int xpos = faceImgDim/2;
+		int ypos = faceImgDim/2;
+		for(int i = 0; i < NUM_FACES; i++){
+			if(i == NUM_FACES/2)
+			{
+				hbox = gtk_hbox_new (TRUE, 1);
+				gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
+			}
+		    face.push_back(new FaceTextureGTK(hbox, faceImgDim));
+			face[i]->setName(rName);
+		}
+
+		hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
+
+		// Back - RoomEntryPage_onBackPage (label)
+		btn_back = gtk_button_new_with_label ("Back");
+		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onBackPage), title);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
+
+		// NewImg - RoomEntryPage_onNewImg (label)
+		btn_new = gtk_button_new_with_label("New Image");
+		gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
+							GTK_SIGNAL_FUNC (FaceEntryPage_onNewImg), title);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
+
+		// Add - RoomEntryPage_onAdd (img)
+		btn_add = gtk_button_new_with_label("Add");
+		gtk_signal_connect (GTK_OBJECT (btn_add), "clicked",
+							GTK_SIGNAL_FUNC (FaceEntryPage_onAdd), &face);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_add, TRUE, TRUE, 0);
+		
+		// Get the face textures
+		Pimp::sharedPimp().getNewFaceTextures(face);
+	}   
 }
 
 // Display
-void FaceEntryPage::display()
+void FaceEntryPageGTK::display()
 {
-    glPushMatrix();
-    
-    
-    
-    if(currentMode == NAME_ENTRY)
-    {
-        title = "Please Enter Your Name";
-        // Draw Btns and Dialogs
-        btn_back->draw();
-        if(dialog_name->getValue() != "")
-            btn_next->setDisabled(false);
-        btn_next->draw();
-        dialog_name->draw();
-    
-        // Keyboard
-        alphaKeys->draw();
-    }
-    else if(currentMode == FACE_RETRIEVAL)
-    {
-        title = "Recording...";
-    }
-    else if(currentMode == FACE_ACCEPTANCE)
-    {
-        title = "Please Select any Image that is NOT you";
-        btn_back->draw();
-        btn_add->draw();
-        btn_new->draw();
-        
-        // Draw the face
-        for(int i = 0; i < NUM_FACES; i++)
-            face[i]->draw();
-    }
-    
-    
-    // Draw the title
-    glColor3f(0, 0, .4);
-    int labelW = displayStringWidth(title);
-    int labelH = displayStringHeight(title);
-    glRasterPos3f((WINDOW_WIDTH/2 - labelW/2), (WINDOW_HEIGHT -10 - labelH/2), 0.5);  
-    displayString(title);
-    
-    glFlush();
-    glPopMatrix();
-    
+       
 }
 
-void FaceEntryPage::cleanUp()
+void FaceEntryPageGTK::cleanUp()
 {
     //delete[] face;
     face.clear();
