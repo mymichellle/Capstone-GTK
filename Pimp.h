@@ -27,6 +27,7 @@
 #ifdef DEBUG
             
             #define SHOW_VIDEO // Show the live video stream
+			//#define DEBUG_ROOMS // Show testing images of room recognition
 
 #endif
 /************************************************************/
@@ -72,6 +73,7 @@ private:
     VideoStream *video;
     IplImage *current_frame;
     IplImage *display_frame;
+	IplImage *gray_frame;
     CvFont font;
 
     // Face Recognition

@@ -166,7 +166,23 @@ void RoomRecognition::loadRoomIpts(string file, string name)
     {
         cout<<"ERROR: cannot load the image from "<<string(s.str())<<endl;
     }
-    surfDetDes(img, ref_ipts, false, 3, 4, 3, 0.004f);
+    surfDetDes(img, ref_ipts, false, 4, 4, 2, 0.0006f);
+
+#ifdef DEBUG_ROOMS
+ 	// Draw box around object
+     for(int i = 0; i < 4; i++ )
+    {
+        CvPoint r1 = src_corners[i%4];
+        CvPoint r2 = src_corners[(i+1)%4];
+        cvLine( img, cvPoint(r1.x, r1.y),
+               cvPoint(r2.x, r2.y), cvScalar(255,255,255), 3 );
+    }
+    
+    for (unsigned int i = 0; i < ref_ipts.size(); ++i)
+        drawIpoint(img, ref_ipts[i]);
+
+    cvShowImage((char*)file.c_str(), img);
+#endif
     
     roomRefIpts.push_back(ref_ipts);
 }
@@ -214,7 +230,8 @@ void RoomRecognition::addRoom(RoomTextureGTK *room)
     char s[200];
     // Extract reference object Ipoints
     IpVec ref_ipts;
-    surfDetDes(room->getImage(), ref_ipts, false, 3, 4, 3, 0.004f);
+    surfDetDes(room->getImage(), ref_ipts, false, 4, 4, 2, 0.0006f);
+
     cout <<"ADD ROOM: "<<nRooms<<endl;
     
     // Set the standard image size
@@ -222,8 +239,7 @@ void RoomRecognition::addRoom(RoomTextureGTK *room)
     src_corners[1] = cvPoint(room->getImage()->width,0);
     src_corners[2] = cvPoint(room->getImage()->width, room->getImage()->height);
     src_corners[3] = cvPoint(0, room->getImage()->height);
-    
-    
+
     // Add to the rooms vector
     roomRefIpts.push_back(ref_ipts);
     
@@ -260,6 +276,22 @@ void RoomRecognition::addRoom(RoomTextureGTK *room)
     room->saveRoomAsJPG(fileName);
     fileNames.push_back(fileName);
     
+#ifdef DEBUG_ROOMS
+ 	// Draw box around object
+     for(int i = 0; i < 4; i++ )
+    {
+        CvPoint r1 = src_corners[i%4];
+        CvPoint r2 = src_corners[(i+1)%4];
+        cvLine( room->getImage(), cvPoint(r1.x, r1.y),
+               cvPoint(r2.x, r2.y), cvScalar(255,255,255), 3 );
+    }
+    
+    for (unsigned int i = 0; i < ref_ipts.size(); ++i)
+        drawIpoint(room->getImage(), ref_ipts[i]);
+
+    cvShowImage((char*)fileName.c_str(), room->getImage());
+#endif
+
     saveToXml();
 }
 
@@ -271,7 +303,22 @@ string RoomRecognition::recognizeRoom(IplImage *image)
     CvPoint dst_corners[4];
     
     // Detect and describe interest points in the frame
-    surfDetDes(image, ipts, false, 3, 4, 3, 0.004f);
+    surfDetDes(image, ipts, false, 4, 4, 2, 0.0006f);
+#ifdef DEBUG_ROOMS
+ 	// Draw box around object
+     for(int i = 0; i < 4; i++ )
+    {
+        CvPoint r1 = src_corners[i%4];
+        CvPoint r2 = src_corners[(i+1)%4];
+        cvLine( image, cvPoint(r1.x, r1.y),
+               cvPoint(r2.x, r2.y), cvScalar(255,255,255), 3 );
+    }
+    
+    for (unsigned int i = 0; i < ipts.size(); ++i)
+        drawIpoint(image, ipts[i]);
+
+    cvShowImage("REC ROOM", image);
+#endif
     cout<<endl<<"RECOGNIZE ROOMS FROM "<< nRooms <<" SAMPLES"<<endl;
     // Compare to all the rooms
     for( int i = 0; i < nRooms; i++)
@@ -285,17 +332,17 @@ string RoomRecognition::recognizeRoom(IplImage *image)
         // This call finds where the object corners should be in the frame
         if (cornersTranslated)
         {
-            // Draw box around object
-           /* for(int i = 0; i < 4; i++ )
+           /* // Draw box around object
+            for(int i = 0; i < 4; i++ )
             {
                 CvPoint r1 = dst_corners[i%4];
                 CvPoint r2 = dst_corners[(i+1)%4];
-                cvLine( display_frame, cvPoint(r1.x, r1.y),
+                cvLine( image, cvPoint(r1.x, r1.y),
                        cvPoint(r2.x, r2.y), cvScalar(255,255,255), 3 );
             }
             
             for (unsigned int i = 0; i < matches.size(); ++i)
-                drawIpoint(display_frame, matches[i].first);*/
+                drawIpoint(image, matches[i].first);*/
             cout<<"FOUND ROOM #"<<i<<endl;
             return roomNames[roomLookUp[i]];
         }

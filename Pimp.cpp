@@ -144,19 +144,12 @@ void Pimp::addRoom(RoomTextureGTK *room){
 
 void Pimp::getNewTexture(BaseTextureGTK *tex){
     // Create a new face texture
-	cout<<"GetNewTexture"<<endl;
     current_frame = video->getImage();
-		cout<<"GetNewTexture1"<<endl;
 	if( current_frame != NULL )
 	{
-		cout<<"GetNewTexture2"<<endl;
-		display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
-
-		cout<<"GetNewTexture3"<<endl;		
-cvFlip (current_frame, display_frame, 1);
-		cout<<"GetNewTexture4"<<endl;
+		display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);	
+		cvFlip (current_frame, display_frame, 1);
 		tex->setImage(display_frame);
-		cout<<"GetNewTexture5"<<endl;
 	}
 	else
 		cout<<"ERROR: getNewTexture - no current frame"<<endl;
@@ -312,11 +305,13 @@ void Pimp::mainProcess()
     }
     
     // Room Recognition
-    /*if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
-    {
+    if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
+    {	
+        gray_frame = cvCreateImage( cvGetSize(display_frame), IPL_DEPTH_8U, 1);
+        cvCvtColor( display_frame, gray_frame, CV_BGR2GRAY);
         roomRecognition();
         lastRoomCycle = cycleNum;
-    }*/
+    }
     
     
 #ifdef SHOW_VIDEO
@@ -388,7 +383,7 @@ void Pimp::initRoomRecognition()
 // Room Recognition run on the current_frame
 void Pimp::roomRecognition()
 {
-    string roomNumber = roomRec->recognizeRoom(display_frame);
+    string roomNumber = roomRec->recognizeRoom(gray_frame);
     roomInImage = roomNumber;
     cvPutText(display_frame, (char*)roomNumber.c_str(), cvPoint(50, 50), &font, CV_RGB(255,0,0));
 }
