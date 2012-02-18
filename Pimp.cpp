@@ -187,6 +187,7 @@ void Pimp::getNewFaceTextures(vector<FaceTextureGTK*> faceText)
     }
     
 }
+
 // Set the Recognition Mode
 void Pimp::setMode(bool faceRecOn, int faceRecRate, bool roomRecOn, int roomRecRate)
 {
@@ -211,6 +212,54 @@ void Pimp::setMode(bool faceRecOn, int faceRecRate, bool roomRecOn, int roomRecR
         currentMode = TEST_MODE;
     }
 }
+
+
+void Pimp::setFaceRec(bool faceRecOn)
+{
+	if(currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM)
+		setMode(faceRecOn, faceRate, true, roomRate);
+	else
+		setMode(faceRecOn, faceRate, false, roomRate);
+}
+
+void Pimp::setFaceRecRate(int faceRecRate)
+{
+	if(currentMode == RECOGNITION)
+	{
+		setMode(true, faceRecRate, true, roomRate);
+	}
+	else if(currentMode == RECOGNITION_ROOM)
+	{
+		setMode(false, faceRecRate, true, roomRate);
+	}
+	else if(currentMode == RECOGNITION_FACE)
+	{
+		setMode(true, faceRecRate, false, roomRate);
+	}
+}
+
+void Pimp::setRoomRec(bool roomRecOn)
+{
+	if(currentMode == RECOGNITION || currentMode == RECOGNITION_FACE)
+		setMode(true, faceRate, roomRecOn, roomRate);
+	else
+		setMode(false, faceRate, roomRecOn, roomRate);
+}
+void Pimp::setRoomRecRate(int roomRecRate)
+{
+	if(currentMode == RECOGNITION)
+	{
+		setMode(true, faceRate, true, roomRecRate);
+	}
+	else if(currentMode == RECOGNITION_ROOM)
+	{
+		setMode(false, faceRate, true, roomRecRate);
+	}
+	else if(currentMode == RECOGNITION_FACE)
+	{
+		setMode(true, faceRate, false, roomRecRate);
+	}
+}    
 
 // Get Recognition modes
 bool Pimp::isFaceRecognition()

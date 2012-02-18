@@ -61,36 +61,6 @@ extern "C"{
 		gtk_entry_append_text((GtkEntry*)dialog, ((KeyboardGTK*)keyboard)->activeKey);
 	}
 
-	// Add Faces and return to main page
-	void FaceEntryPage_onAddPress()
-	{
-		// Add Faces
-		/*for(int i = 0; i < NUM_FACES; i++)
-		{
-		    face[i]->setName(dialog_name->getValue());
-		    Pimp::sharedPimp().addFace(face[i]);
-		}
-		
-		// Return to main page
-		Pimp::sharedPimp().setDisplayPage(new MainPage());
-		cleanUp();
-		Pimp::sharedPimp().videoOff();
-		
-		// Update known faces
-		Pimp::sharedPimp().updateEigenFaces();*/
-	}
-
-	// Progress to the next mode
-	void FaceEntryPage_onNextPress()
-	{
-		/*currentMode = FACE_RETRIEVAL;
-		glutPostRedisplay();
-		// Capture faces
-		Pimp::sharedPimp().getNewFaceTextures(face);
-		currentMode = FACE_ACCEPTANCE;
-		glutPostRedisplay();*/
-	}
-
 	// Get new image
 	void FaceEntryPage_onNewPress()
 	{

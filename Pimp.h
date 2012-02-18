@@ -113,7 +113,11 @@ public:
         return instance;
     }
     // Set the recognition mode
-    void setMode(bool faceRecOn, int faceRecRate, bool roomRecOn, int roomRecRate);    
+    void setMode(bool faceRecOn, int faceRecRate, bool roomRecOn, int roomRecRate);
+	void setFaceRec(bool faceRecOn);
+	void setFaceRecRate(int faceRecRate);
+	void setRoomRec(bool roomRecOn);
+	void setRoomRecRate(int roomRecRate);    
     
     // Set active page
     void setDisplayPage(BasePageGTK *newPage);
