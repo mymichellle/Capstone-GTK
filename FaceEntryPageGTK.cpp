@@ -168,7 +168,7 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		gtk_box_pack_start( GTK_BOX(window), btn_record, TRUE, TRUE, 0);
 
 		btn_play = gtk_button_new_with_label ("PLAY");
-        gtk_signal_connect (GTK_OBJECT (btn_record), "clicked",
+        gtk_signal_connect (GTK_OBJECT (btn_play), "clicked",
 		                    GTK_SIGNAL_FUNC (FaceEntryPage_onPlayEntry), NULL);
 		gtk_box_pack_start( GTK_BOX(window), btn_play, TRUE, TRUE, 0);
 
