@@ -60,6 +60,7 @@ Pimp::Pimp()
     dir = string(cCurrentPath);
     faceDir = dir +"/Faces/Known/";
     roomDir = dir +"/Rooms/";
+    soundDir = dir + "/Sound/";
     initialized = false;
     cycleNum = 0;
     lastRoomCycle = 0;
@@ -399,3 +400,20 @@ void Pimp::roomRecognition()
     cvPutText(display_frame, (char*)roomNumber.c_str(), cvPoint(50, 50), &font, CV_RGB(255,0,0));
 }
 
+// Initialize Audio Utility
+void Pimp::initAudioUtility()
+{
+    audioUtility = new AudioUtility();
+}
+
+void Pimp::recordSound(char *fileName)
+{
+    printf("PIMP::recordSound");
+    audioUtility->recordSound(fileName);
+}
+
+void Pimp::playbackSound(char *fileName)
+{
+    printf("PIMP::playbackSound");
+    audioUtility->playbackSound(fileName);
+}

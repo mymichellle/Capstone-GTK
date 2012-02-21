@@ -22,6 +22,18 @@ extern "C"{
 		    Pimp::sharedPimp().videoOff();
 	}
 
+    void FaceEntryPage_onRecordEntry(GtkWidget *btn)
+    {
+        // Record Audio Clip for Current Face
+        Pimp::sharedPimp().recordSound("test.dat");
+    }
+
+    void FaceEntryPage_onPlayEntry(GtkWidget *btn)
+    {
+        // Playback Current Audio Recording for Current Face
+        Pimp::sharedPimp().playbackSound("test.dat");
+    }
+
 	void FaceEntryPage_onBackEntry(GtkWidget *btn, GtkWidget *label)
 	{
 		// Go back to INIT_ROOM mode pass name from label
@@ -151,9 +163,13 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
 		btn_record = gtk_button_new_with_label ("RECORD");
+        gtk_signal_connect (GTK_OBJECT (btn_record), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onRecordEntry), NULL);
 		gtk_box_pack_start( GTK_BOX(window), btn_record, TRUE, TRUE, 0);
 
 		btn_play = gtk_button_new_with_label ("PLAY");
+        gtk_signal_connect (GTK_OBJECT (btn_record), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onPlayEntry), NULL);
 		gtk_box_pack_start( GTK_BOX(window), btn_play, TRUE, TRUE, 0);
 
 		// hBox

@@ -21,6 +21,7 @@
 #include "BaseTextureGTK.h"
 #include "RoomTextureGTK.h"
 #include "FaceTextureGTK.h"
+#include "AudioUtility.h"
 
 /************    Debug enable triggers    *******************/
 //#define DEBUG // Toggle all Debug code on
@@ -91,12 +92,18 @@ private:
     void initRoomRecognition();
     void roomRecognition();
     
+    // Audio I/O
+    AudioUtility *audioUtility;
+    void initAudioUtility();
+    
+
     // File path
     std::string dir;
     std::string faceDir;
     std::string knownFacesDoc;
     std::string unknownFacesDoc;
     std::string roomDir;
+    std::string soundDir;
     
     // Output
     std::string personInImage;
@@ -145,6 +152,10 @@ public:
     
 	// Room Texture
 	RoomTextureGTK *roomTexture;
+
+    // Sound Functions
+    void recordSound(char *);
+    void playbackSound(char *);
 
     // Getters
     std::string getFaceDir(){return faceDir;};
