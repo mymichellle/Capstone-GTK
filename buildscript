@@ -14,9 +14,11 @@ g++ -Wfatal-errors \
 -Xlinker -rpath -Xlinker /usr/lib \
 -I. \
 -lm -lpthread \
+-lrt -lasound \
 *.cpp \
 OpenSurf/*.cpp \
 -Xlinker -L/usr/lib -Xlinker -l:libgtk-x11-2.0.so.0 -l:libatk-1.0.so.0 \
 -l:libgdk_pixbuf-2.0.so.0 -l:libpango-1.0.so.0 -l:libcairo.so.2 \
 -l:libgobject-2.0.so.0 -l:libgmodule-2.0.so.0 -l:libdl.so -l:libglib-2.0.so.0 \
-`pkg-config opencv --libs --cflags`
+`pkg-config opencv --libs --cflags` \
+/home/root/sound/portaudio/lib/.libs/libportaudio.a
