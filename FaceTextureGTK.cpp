@@ -14,6 +14,17 @@
 
 using namespace std;
 
+extern "C"{
+	// Goes back to main page
+	void FaceTexture_Press(GtkWidget *btn, FaceTextureGTK *faceText)
+	{
+		std::vector<FaceTextureGTK*> face;
+		face.push_back(faceText);
+		
+		Pimp::sharedPimp().getNewFaceTextures(face);
+	}
+}
+
 FaceTextureGTK::FaceTextureGTK(GtkWidget *holder, int d)
 {
     // Defualt values
@@ -26,8 +37,10 @@ FaceTextureGTK::FaceTextureGTK(GtkWidget *holder, int d)
     width = d;
     height = d;
     
-	box = gtk_hbox_new (TRUE,1);
+	box = gtk_toggle_button_new();//gtk_hbox_new (TRUE,1);
 	gtk_box_pack_start( GTK_BOX(holder), box, TRUE, TRUE, 0);
+	gtk_signal_connect (GTK_OBJECT (box), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceTexture_Press), this);
 
     invalid = false;
 }
@@ -40,7 +53,7 @@ void FaceTextureGTK::setFace(IplImage *img, IplImage *proc, CvRect r)
 	 cvSetImageROI(image,r);
     wholeRegion = cvRect(0, 0, img->width, img->height);
     gtk_img = convertOpenCv2Gtk(image, width, height);
-	gtk_box_pack_start( GTK_BOX(box), gtk_img, TRUE, TRUE, 0);
+	gtk_button_set_image(GTK_BUTTON(box), gtk_img);	
 	cvResetImageROI(image);
 }
 

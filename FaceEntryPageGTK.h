@@ -48,6 +48,7 @@ private:
         
     // Face Textures
     //FaceTexture* face[NUM_FACES];
+	std::vector<GtkWidget*> faceBtn;
     std::vector<FaceTextureGTK*> face;
     
     void cleanUp();

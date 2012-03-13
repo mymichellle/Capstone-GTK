@@ -112,12 +112,16 @@ void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
 		gtk_box_pack_start( GTK_BOX(window), dialog_name, TRUE, TRUE, 0);
 		
 		// Keyboard - RoomEntryPage_keyType (dialog)
+		GtkWidget *keyWindow = gtk_hbox_new (FALSE, 1);
+		gtk_box_pack_start(GTK_BOX(window), keyWindow, TRUE,TRUE,0);
+    	GtkWidget *separator = gtk_vseparator_new();
 		keyboard = keyboardGTK_new();
 		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK",
 							GTK_SIGNAL_FUNC (RoomEntryPage_keyType), dialog_name);
 		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK_delete",
 							GTK_SIGNAL_FUNC (RoomEntryPage_keyDelete), dialog_name);
-		gtk_box_pack_start(GTK_BOX(window), keyboard, TRUE,TRUE,0);
+		gtk_box_pack_start(GTK_BOX(keyWindow), separator, FALSE,TRUE,15);
+		gtk_box_pack_start(GTK_BOX(keyWindow), keyboard, TRUE,TRUE,0);
 
 	}
 	else if(mode == IMG_ROOM)

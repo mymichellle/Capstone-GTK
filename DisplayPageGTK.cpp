@@ -47,7 +47,7 @@ DisplayPageGTK::DisplayPageGTK()
 {
     // Window box to contain this page
     window = gtk_vbox_new (TRUE,1);  
-	g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) window); 
+	g_timeout_add(1000, (GSourceFunc) time_handler, (gpointer) window); 
 	gtk_widget_show_all(window);
     
 	// Title
@@ -61,7 +61,7 @@ DisplayPageGTK::DisplayPageGTK()
     personName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), personName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
-	g_timeout_add(500, (GSourceFunc) update_person_name, (gpointer) personName); 
+	g_timeout_add(1000, (GSourceFunc) update_person_name, (gpointer) personName); 
 
 	box = gtk_hbox_new(TRUE,1);
 
@@ -70,7 +70,7 @@ DisplayPageGTK::DisplayPageGTK()
     roomName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), roomName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
-	g_timeout_add(500, (GSourceFunc) update_room_name, (gpointer) roomName); 
+	g_timeout_add(1000, (GSourceFunc) update_room_name, (gpointer) roomName); 
     
     // Buttons
     btn_back = gtk_button_new_with_label ("Back");

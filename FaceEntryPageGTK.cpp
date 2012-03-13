@@ -26,6 +26,7 @@ extern "C"{
 	{
 		// Go back to INIT_ROOM mode pass name from label
 		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(NAME_ENTRY, gtk_label_get_text(GTK_LABEL(label))));
+		    Pimp::sharedPimp().videoOff();
 	}
 
 	void FaceEntryPage_onGetImg(GtkWidget *btn, GtkWidget *dialog)
@@ -155,12 +156,16 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		gtk_box_pack_start( GTK_BOX(window), dialog_name, TRUE, TRUE, 0);
 		
 		// Keyboard - RoomEntryPage_keyType (dialog)
+		GtkWidget *keyWindow = gtk_hbox_new (FALSE, 1);
+		gtk_box_pack_start(GTK_BOX(window), keyWindow, TRUE,TRUE,0);
+    	GtkWidget *separator = gtk_vseparator_new();
 		keyboard = keyboardGTK_new();
 		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK",
 							GTK_SIGNAL_FUNC (FaceEntryPage_keyType), dialog_name);
 		gtk_signal_connect (GTK_OBJECT (keyboard), "keyboardGTK_delete",
 							GTK_SIGNAL_FUNC (FaceEntryPage_keyDelete), dialog_name);
-		gtk_box_pack_start(GTK_BOX(window), keyboard, TRUE,TRUE,0);
+		gtk_box_pack_start(GTK_BOX(keyWindow), separator, FALSE,TRUE,15);
+		gtk_box_pack_start(GTK_BOX(keyWindow), keyboard, TRUE,TRUE,0);
 	}
 	else if(mode == FACE_ACCEPTANCE)
 	{
@@ -186,6 +191,8 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 				hbox = gtk_hbox_new (TRUE, 1);
 				gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
 			}
+			//faceBtn.push_back(gtk_button_new());
+			//gtk_box_pack_start(GTK_BOX(hbox), faceBtn[i], TRUE, TRUE, 0);
 		    face.push_back(new FaceTextureGTK(hbox, faceImgDim));
 			face[i]->setName(rName);
 		}
