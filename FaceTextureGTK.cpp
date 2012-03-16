@@ -37,7 +37,7 @@ FaceTextureGTK::FaceTextureGTK(GtkWidget *holder, int d)
     width = d;
     height = d;
     
-	box = gtk_toggle_button_new();//gtk_hbox_new (TRUE,1);
+	box = gtk_button_new();//gtk_hbox_new (TRUE,1);
 	gtk_box_pack_start( GTK_BOX(holder), box, TRUE, TRUE, 0);
 	gtk_signal_connect (GTK_OBJECT (box), "clicked",
 		                    GTK_SIGNAL_FUNC (FaceTexture_Press), this);

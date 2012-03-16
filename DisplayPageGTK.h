@@ -23,7 +23,7 @@ private:
     // Display Text
     GtkWidget *personName;
     GtkWidget *roomName;
-    
+
     // Buttons
     GtkWidget *btn_back;
 
@@ -36,6 +36,12 @@ public:
     
     // Display
     void display();
+
+	// Getters && Setters
+	void setPersonName(std::string name);
+	void setRoomName(std::string name);
+	void redrawPage();
+	bool isActive();
 };
 
 #endif

@@ -12,8 +12,10 @@
 using namespace std;
 
 extern "C"{
-    void DisplayPage_onBackPress()
+    void DisplayPage_onBackPress(gint* timeoutHandler)
     {
+		// Stop the timeout loop
+		//gtk_timeout_remove(*timeoutHandler);
         // Stop the camera and go back to the main page
         Pimp::sharedPimp().videoOff();
         Pimp::sharedPimp().setDisplayPage(new MainPageGTK());
@@ -41,13 +43,23 @@ extern "C"{
  		if (widget->window == NULL) return FALSE;
 		gtk_label_set_text(GTK_LABEL( widget), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
 	}
+
+	static gboolean updateEverything(DisplayPageGTK *displayPage)
+	{
+		if(displayPage == NULL || !displayPage->isActive()) return FALSE;
+    	Pimp::sharedPimp().mainProcess();  
+		displayPage->redrawPage();
+		displayPage->setRoomName(Pimp::sharedPimp().getRecognizedRoom());
+		displayPage->setPersonName(Pimp::sharedPimp().getRecognizedPerson());
+	}
 }
 
 DisplayPageGTK::DisplayPageGTK()
 {
     // Window box to contain this page
     window = gtk_vbox_new (TRUE,1);  
-	g_timeout_add(1000, (GSourceFunc) time_handler, (gpointer) window); 
+	//g_timeout_add(500, (GSourceFunc) time_handler, (gpointer) window);
+	timeout_handler_id = gtk_idle_add_priority( G_PRIORITY_HIGH, (GSourceFunc) updateEverything, (gpointer) this); 
 	gtk_widget_show_all(window);
     
 	// Title
@@ -61,7 +73,7 @@ DisplayPageGTK::DisplayPageGTK()
     personName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), personName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
-	g_timeout_add(1000, (GSourceFunc) update_person_name, (gpointer) personName); 
+	//g_timeout_add(1000, (GSourceFunc) update_person_name, (gpointer) personName); 
 
 	box = gtk_hbox_new(TRUE,1);
 
@@ -70,12 +82,12 @@ DisplayPageGTK::DisplayPageGTK()
     roomName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), roomName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
-	g_timeout_add(1000, (GSourceFunc) update_room_name, (gpointer) roomName); 
+	//g_timeout_add(1000, (GSourceFunc) update_room_name, (gpointer) roomName); 
     
     // Buttons
     btn_back = gtk_button_new_with_label ("Back");
     gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
-                        GTK_SIGNAL_FUNC (DisplayPage_onBackPress), NULL);
+                        GTK_SIGNAL_FUNC (DisplayPage_onBackPress), (gpointer) &timeout_handler_id);
     gtk_box_pack_start( GTK_BOX(window), btn_back, TRUE, TRUE, 0);
     
     // Start the camera
@@ -109,4 +121,27 @@ void DisplayPageGTK::display()
     
 	gtk_label_set_text(GTK_LABEL(personName),(gchar*)Pimp::sharedPimp().getRecognizedPerson().c_str());
     gtk_label_set_text(GTK_LABEL( roomName), (gchar*)Pimp::sharedPimp().getRecognizedRoom().c_str());
+}
+
+void DisplayPageGTK::setPersonName(std::string name)
+{
+	gtk_label_set_text(GTK_LABEL( personName), (gchar*)name.c_str());	
+}
+
+void DisplayPageGTK::setRoomName(std::string name)
+{
+	gtk_label_set_text(GTK_LABEL( roomName), (gchar*)name.c_str());
+}
+
+void DisplayPageGTK::redrawPage()
+{
+	gtk_widget_queue_draw(window);
+}
+
+bool DisplayPageGTK::isActive()
+{
+	if(window->window == NULL)
+		return false;
+	else
+		return true;
 }
