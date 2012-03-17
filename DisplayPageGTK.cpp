@@ -46,9 +46,9 @@ extern "C"{
 
 	static gboolean updateEverything(DisplayPageGTK *displayPage)
 	{
-		if(displayPage == NULL || !displayPage->isActive()) return FALSE;
+		if(displayPage == NULL || displayPage->getWindow()->window == NULL) return FALSE;
     	Pimp::sharedPimp().mainProcess();  
-		displayPage->redrawPage();
+		displayPage->redraw();
 		displayPage->setRoomName(Pimp::sharedPimp().getRecognizedRoom());
 		displayPage->setPersonName(Pimp::sharedPimp().getRecognizedPerson());
 	}
@@ -133,15 +133,3 @@ void DisplayPageGTK::setRoomName(std::string name)
 	gtk_label_set_text(GTK_LABEL( roomName), (gchar*)name.c_str());
 }
 
-void DisplayPageGTK::redrawPage()
-{
-	gtk_widget_queue_draw(window);
-}
-
-bool DisplayPageGTK::isActive()
-{
-	if(window->window == NULL)
-		return false;
-	else
-		return true;
-}

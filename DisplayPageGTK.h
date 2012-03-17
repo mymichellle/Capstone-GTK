@@ -40,8 +40,6 @@ public:
 	// Getters && Setters
 	void setPersonName(std::string name);
 	void setRoomName(std::string name);
-	void redrawPage();
-	bool isActive();
 };
 
 #endif
