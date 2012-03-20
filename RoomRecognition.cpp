@@ -319,7 +319,7 @@ string RoomRecognition::recognizeRoom(IplImage *image)
 
     cvShowImage("REC ROOM", image);
 #endif
-    cout<<endl<<"RECOGNIZE ROOMS FROM "<< nRooms <<" SAMPLES"<<endl;
+    //cout<<endl<<"RECOGNIZE ROOMS FROM "<< nRooms <<" SAMPLES"<<endl;
     // Compare to all the rooms
     for( int i = 0; i < nRooms; i++)
     {
@@ -343,7 +343,7 @@ string RoomRecognition::recognizeRoom(IplImage *image)
             
             for (unsigned int i = 0; i < matches.size(); ++i)
                 drawIpoint(image, matches[i].first);*/
-            cout<<"FOUND ROOM #"<<i<<endl;
+            //cout<<"FOUND ROOM #"<<i<<endl;
             return roomNames[roomLookUp[i]];
         }
     }

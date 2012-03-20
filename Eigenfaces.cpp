@@ -474,7 +474,7 @@ std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
     std::stringstream output;
     output << personNames[nearest] <<" "<< confidence;
     //return ss.str();
-    cout<< personNames[nearest]<<" "<<confidence;
+    //cout<< personNames[nearest]<<" "<<confidence;
     if(confidence > FACE_RECOGNITION_CONFIDENCE)
         return output.str();
     else
@@ -489,12 +489,12 @@ void Eigenfaces::addFace(FaceTextureGTK *face)
     
     if(!empty)
     {
-        cout<<"addFace not Empty nPersons: "<<nPersons<<endl;
+        //cout<<"addFace not Empty nPersons: "<<nPersons<<endl;
         for(int i = 0; i < nPersons; i++)
         {
             if(personNames[i] == face->getName())
             {
-                cout<<"found a match "<< i <<endl;
+                //cout<<"found a match "<< i <<endl;
                 imageFileName.str("");
                 imageFileName << face->getName() << (nImagesPerson[i]);
                 nImagesPerson[i] = nImagesPerson[i] + 1;
@@ -513,15 +513,15 @@ void Eigenfaces::addFace(FaceTextureGTK *face)
             nImagesPerson.clear();
         }
         
-        cout<<"Name was not found"<<endl<<endl;
-        cout<<"  nPersons start: "<<nPersons<<endl;
+        //cout<<"Name was not found"<<endl<<endl;
+        //cout<<"  nPersons start: "<<nPersons<<endl;
         personNames.push_back(face->getName());
         nImagesPerson.push_back(0);
         imageFileName.str("");
         imageFileName << face->getName() << (nImagesPerson[nPersons]);
         nPersons++;
         
-        cout<<"  nPersons end: "<<nPersons<<endl;
+        //cout<<"  nPersons end: "<<nPersons<<endl;
         empty = false;
     }
     

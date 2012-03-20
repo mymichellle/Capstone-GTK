@@ -22,20 +22,27 @@ extern "C"{
 		    Pimp::sharedPimp().videoOff();
 	}
 
-	void FaceEntryPage_onBackPage(GtkWidget *btn, GtkWidget *label)
+	void FaceEntryPage_onBackEntry(GtkWidget *btn, GtkWidget *label)
 	{
 		// Go back to INIT_ROOM mode pass name from label
 		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(NAME_ENTRY, gtk_label_get_text(GTK_LABEL(label))));
 		    Pimp::sharedPimp().videoOff();
 	}
 
-	void FaceEntryPage_onGetImg(GtkWidget *btn, GtkWidget *dialog)
-	{	
-		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(FACE_ACCEPTANCE, gtk_entry_get_text((GtkEntry*)dialog)));
+	void FaceEntryPage_onBackPage(GtkWidget *btn, GtkWidget *label)
+	{
+		// Go back to INIT_ROOM mode pass name from label
+		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(NAME_RECORD, gtk_label_get_text(GTK_LABEL(label))));
+		    Pimp::sharedPimp().videoOff();
 	}
 
-	void FaceEntryPage_onNewImg(GtkWidget *btn, GtkWidget *label)
-	{
+	void FaceEntryPage_onNextRecord(GtkWidget *btn, GtkWidget *dialog)
+	{	
+		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(NAME_RECORD, gtk_entry_get_text((GtkEntry*)dialog)));
+	}
+
+	void FaceEntryPage_onGetImg(GtkWidget *btn, GtkWidget *label)
+	{	
 		Pimp::sharedPimp().setDisplayPage(new FaceEntryPageGTK(FACE_ACCEPTANCE, gtk_label_get_text(GTK_LABEL(label))));
 	}
 
@@ -133,23 +140,7 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		title = gtk_label_new("Face Entry");
 		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
-		// hBox
-		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
-		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
-
-		// Back - RoomEntryPage_onBackExit
-		btn_back = gtk_button_new_with_label ("Back");
-		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
-		                    GTK_SIGNAL_FUNC (FaceEntryPage_onBackExit), NULL);
-		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
-
 		dialog_name = gtk_entry_new();
-
-		// TakeImg - RoomEntryPage_onGetImg (Dialog)
-		btn_next = gtk_button_new_with_label("Get Image");
-		gtk_signal_connect (GTK_OBJECT (btn_next), "clicked",
-							GTK_SIGNAL_FUNC (FaceEntryPage_onGetImg), dialog_name);
-		gtk_box_pack_start( GTK_BOX(hbox), btn_next, TRUE, TRUE, 0);
 		
 		// Dialog - rName
 		gtk_entry_set_text((GtkEntry*)dialog_name, (char*)rName.c_str());
@@ -166,6 +157,53 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 							GTK_SIGNAL_FUNC (FaceEntryPage_keyDelete), dialog_name);
 		gtk_box_pack_start(GTK_BOX(keyWindow), separator, FALSE,TRUE,15);
 		gtk_box_pack_start(GTK_BOX(keyWindow), keyboard, TRUE,TRUE,0);
+
+
+		// hBox
+		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
+
+		// Back - RoomEntryPage_onBackExit
+		btn_back = gtk_button_new_with_label ("Back");
+		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onBackExit), NULL);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
+
+
+		// TakeImg - RoomEntryPage_onGetImg (Dialog)
+		btn_next = gtk_button_new_with_label("Next");
+		gtk_signal_connect (GTK_OBJECT (btn_next), "clicked",
+							GTK_SIGNAL_FUNC (FaceEntryPage_onNextRecord), dialog_name);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_next, TRUE, TRUE, 0);
+	}
+	else if(mode == NAME_RECORD)
+	{
+		// label - rName
+		title = gtk_label_new((char*)rName.c_str());
+		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
+
+		btn_record = gtk_button_new_with_label ("RECORD");
+		gtk_box_pack_start( GTK_BOX(window), btn_record, TRUE, TRUE, 0);
+
+		btn_play = gtk_button_new_with_label ("PLAY");
+		gtk_box_pack_start( GTK_BOX(window), btn_play, TRUE, TRUE, 0);
+
+		// hBox
+		GtkWidget *hbox = gtk_hbox_new (TRUE, 1);
+		gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
+
+		// Back - RoomEntryPage_onBackExit
+		btn_back = gtk_button_new_with_label ("Back");
+		gtk_signal_connect (GTK_OBJECT (btn_back), "clicked",
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onBackEntry), title);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
+
+
+		// TakeImg - RoomEntryPage_onGetImg (Dialog)
+		btn_next = gtk_button_new_with_label("Next");
+		gtk_signal_connect (GTK_OBJECT (btn_next), "clicked",
+							GTK_SIGNAL_FUNC (FaceEntryPage_onGetImg), title);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_next, TRUE, TRUE, 0);
 	}
 	else if(mode == FACE_ACCEPTANCE)
 	{
@@ -206,17 +244,11 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		                    GTK_SIGNAL_FUNC (FaceEntryPage_onBackPage), title);
 		gtk_box_pack_start( GTK_BOX(hbox), btn_back, TRUE, TRUE, 0);
 
-		// NewImg - RoomEntryPage_onNewImg (label)
-		btn_new = gtk_button_new_with_label("New Image");
-		gtk_signal_connect (GTK_OBJECT (btn_new), "clicked",
-							GTK_SIGNAL_FUNC (FaceEntryPage_onNewImg), title);
-		gtk_box_pack_start( GTK_BOX(hbox), btn_new, TRUE, TRUE, 0);
-
 		// Add - RoomEntryPage_onAdd (img)
-		btn_add = gtk_button_new_with_label("Add");
-		gtk_signal_connect (GTK_OBJECT (btn_add), "clicked",
+		btn_next = gtk_button_new_with_label("Add");
+		gtk_signal_connect (GTK_OBJECT (btn_next), "clicked",
 							GTK_SIGNAL_FUNC (FaceEntryPage_onAdd), &face);
-		gtk_box_pack_start( GTK_BOX(hbox), btn_add, TRUE, TRUE, 0);
+		gtk_box_pack_start( GTK_BOX(hbox), btn_next, TRUE, TRUE, 0);
 		
 		// Get the face textures
 		Pimp::sharedPimp().getNewFaceTextures(face);

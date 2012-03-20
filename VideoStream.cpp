@@ -42,10 +42,23 @@ IplImage* VideoStream::getImage()
         cout<<"ERROR: capture is NULL" << endl;
         return NULL;
     }
-    
+	//cout<<"test "<<CV_CAP_PROP_POS_FRAMES<<endl;
+	//double pos_frames = cvGetCaptureProperty(capture, CV_CAP_PROP_POS_FRAMES);
+	//cout<<"getImage frame position: "<<pos_frames<<endl;
+    /*
+	property identifier. Can be one of the following:
+	CV_CAP_PROP_POS_MSEC - film current position in milliseconds or video capture timestamp
+	CV_CAP_PROP_POS_FRAMES - 0-based index of the frame to be decoded/captured next
+	CV_CAP_PROP_POS_AVI_RATIO - relative position of video file (0 - start of the film, 1 - end of the film)
+	CV_CAP_PROP_FRAME_WIDTH - width of frames in the video stream
+	CV_CAP_PROP_FRAME_HEIGHT - height of frames in the video stream
+	CV_CAP_PROP_FPS - frame rate
+	CV_CAP_PROP_FOURCC - 4-character code of codec. CV_CAP_PROP_FRAME_COUNT - number of frames in video file.
+	*/
+
     // Resize the frame
     cvResize(cvQueryFrame(capture), small_frame,CV_INTER_LINEAR);
-    
+
     return small_frame;
 }
 

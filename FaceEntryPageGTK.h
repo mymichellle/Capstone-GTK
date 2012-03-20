@@ -18,6 +18,7 @@
 
 enum FaceEntryMode{
         NAME_ENTRY,
+		NAME_RECORD,
         FACE_RETRIEVAL,
         FACE_ACCEPTANCE
     };
@@ -33,9 +34,9 @@ private:
     
     // Buttons
     GtkWidget *btn_back;
-    GtkWidget *btn_add;
-    GtkWidget *btn_new;
     GtkWidget *btn_next;
+	GtkWidget *btn_play;
+	GtkWidget *btn_record;
     
     // Dialog
     GtkWidget *dialog_name;
