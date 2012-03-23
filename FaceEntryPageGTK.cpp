@@ -213,6 +213,8 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		
 		// Get the face textures
 		Pimp::sharedPimp().getNewFaceTextures(face);
+
+		Pimp::sharedPimp().videoOff();
 	}   
 }
 
