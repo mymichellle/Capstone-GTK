@@ -293,32 +293,37 @@ void Pimp::initProcess()
 // Main Processing Loop
 void Pimp::mainProcess()
 {
-	cout<<"HERE"<<endl;
     current_frame = video->getImage();
-    display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
-    assert (current_frame && display_frame);
-    
-    current_frame = video->getImage();
-    // set display_frame to flipped current_frame
-    cvFlip (current_frame, display_frame, 1);
-    
-    // Face Recognition
-    if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
-    {
-        faceRecognition();
-        lastFaceCycle = cycleNum;
-    }
-    
-    // Room Recognition
-    if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
-    {	
-        gray_frame = cvCreateImage( cvGetSize(display_frame), IPL_DEPTH_8U, 1);
-        cvCvtColor( display_frame, gray_frame, CV_BGR2GRAY);
-        roomRecognition();
-        lastRoomCycle = cycleNum;
-    }
-    
-    
+	bool doFace = false;
+	bool doRoom = false;    
+	if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
+    	doFace = true;
+	if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
+    	doRoom = true;
+
+	if(doRoom || doFace)
+	{
+		display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
+		assert (current_frame && display_frame);
+		
+		// set display_frame to flipped current_frame
+		cvFlip (current_frame, display_frame, 1);
+		
+		// Face Recognition
+		if( doFace )
+		{
+		    faceRecognition();
+		    lastFaceCycle = cycleNum;
+		}
+		
+		// Room Recognition
+		if( doRoom)
+		{	
+		    gray_frame = cvCreateImage( cvGetSize(display_frame), IPL_DEPTH_8U, 1);
+		    cvCvtColor( display_frame, gray_frame, CV_BGR2GRAY);
+		    roomRecognition();
+		    lastRoomCycle = cycleNum;
+		}
 #ifdef SHOW_VIDEO
     // Draw the FPS figure
     drawFPS(display_frame);
@@ -327,7 +332,8 @@ void Pimp::mainProcess()
     cvShowImage(WINDOW_NAME, display_frame);
    
 #endif
-    // cvWaitKey(1);
+	}
+    
     cycleNum++;
 }
 
