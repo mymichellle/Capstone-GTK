@@ -23,7 +23,7 @@
 #include "FaceTextureGTK.h"
 
 /************    Debug enable triggers    *******************/
-#define DEBUG // Toggle all Debug code on
+//#define DEBUG // Toggle all Debug code on
 #ifdef DEBUG
             
             #define SHOW_VIDEO // Show the live video stream
@@ -138,6 +138,7 @@ public:
     
 	// Helper Function
     void getNewFaceTextures(std::vector<FaceTextureGTK*> faceText);
+	void getNewFace(FaceTextureGTK* faceText);
 	void getNewTexture(BaseTextureGTK *tex);
 
     void testProc();

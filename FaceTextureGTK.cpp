@@ -18,10 +18,9 @@ extern "C"{
 	// Goes back to main page
 	void FaceTexture_Press(GtkWidget *btn, FaceTextureGTK *faceText)
 	{
-		std::vector<FaceTextureGTK*> face;
-		face.push_back(faceText);
-		
-		Pimp::sharedPimp().getNewFaceTextures(face);
+    	Pimp::sharedPimp().videoOn();
+		Pimp::sharedPimp().getNewFace(faceText);
+    	Pimp::sharedPimp().videoOff();
 	}
 }
 

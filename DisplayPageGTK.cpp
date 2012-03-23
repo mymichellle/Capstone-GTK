@@ -47,20 +47,21 @@ extern "C"{
 	static gboolean updateEverything(DisplayPageGTK *displayPage)
 	{
 		if(displayPage == NULL || displayPage->getWindow()->window == NULL) return FALSE;
-    	Pimp::sharedPimp().mainProcess();  
-		displayPage->redraw();
+  
 		displayPage->setRoomName(Pimp::sharedPimp().getRecognizedRoom());
 		displayPage->setPersonName(Pimp::sharedPimp().getRecognizedPerson());
+		displayPage->redraw();
+
+    	Pimp::sharedPimp().mainProcess();
 	}
+
 }
 
 DisplayPageGTK::DisplayPageGTK()
 {
     // Window box to contain this page
     window = gtk_vbox_new (TRUE,1);  
-	//g_timeout_add(500, (GSourceFunc) time_handler, (gpointer) window);
-	timeout_handler_id = gtk_idle_add_priority( G_PRIORITY_HIGH, (GSourceFunc) updateEverything, (gpointer) this); 
-	gtk_widget_show_all(window);
+	
     
 	// Title
     title = gtk_label_new("Display Page");
@@ -73,7 +74,6 @@ DisplayPageGTK::DisplayPageGTK()
     personName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), personName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
-	//g_timeout_add(1000, (GSourceFunc) update_person_name, (gpointer) personName); 
 
 	box = gtk_hbox_new(TRUE,1);
 
@@ -82,7 +82,6 @@ DisplayPageGTK::DisplayPageGTK()
     roomName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), roomName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
-	//g_timeout_add(1000, (GSourceFunc) update_room_name, (gpointer) roomName); 
     
     // Buttons
     btn_back = gtk_button_new_with_label ("Back");
@@ -95,6 +94,7 @@ DisplayPageGTK::DisplayPageGTK()
     Pimp::sharedPimp().initProcess();
 
 	// Create a timer
+	gtk_idle_add_priority( G_PRIORITY_LOW, (GSourceFunc) updateEverything, (gpointer) this); 
 }
 
 void DisplayPageGTK::runLoop()

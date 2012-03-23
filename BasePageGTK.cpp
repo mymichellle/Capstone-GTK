@@ -27,6 +27,6 @@ GtkWidget* BasePageGTK::getWindow()
 
 void BasePageGTK::redraw()
 {
-	gtk_widget_queue_draw(window);
+	gtk_widget_show_all(window);
 }
 

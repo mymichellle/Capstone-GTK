@@ -79,44 +79,6 @@ extern "C"{
 			gtk_entry_set_text((GtkEntry*)dialog,(char*)text.c_str());
 		}
 	}
-
-	// Get new image
-	void FaceEntryPage_onNewPress()
-	{
-		// Create a new faceTexture vector of invalid faces
-	/*	vector<FaceTexture*> invalidFaces;
-		int numInvalid = 0;
-		for(int i = 0; i < NUM_FACES; i++)
-		{
-		    if(face[i]->isInvalid())
-		    {
-		        face[i]->setInvalid(false);
-		        invalidFaces.push_back(face[i]);
-		    }
-		}
-		
-		// Get more face textures to replace invalid ones
-		Pimp::sharedPimp().getNewFaceTextures(invalidFaces);
-		
-		int sizeNewFaces = invalidFaces.size();
-		int newFacePos = 0;
-		
-		// Replace the invalid faces with the new ones
-		for(int i = 0; i < numInvalid; i++)
-		{
-		    if(face[i]->isInvalid() && newFacePos<sizeNewFaces)
-		    {
-		        cout<<"Replacing and setting valid"<<endl;
-		        face[i] = invalidFaces[newFacePos];
-		        face[i]->setInvalid(false);
-		        newFacePos++;
-		    }
-		}
-		
-		invalidFaces.clear();
-		// Redraw
-		glutPostRedisplay();*/
-	}
 }
 
 FaceEntryPageGTK::FaceEntryPageGTK()
@@ -230,7 +192,6 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 				gtk_box_pack_start( GTK_BOX(window), hbox, TRUE, TRUE, 0);
 			}
 			//faceBtn.push_back(gtk_button_new());
-			//gtk_box_pack_start(GTK_BOX(hbox), faceBtn[i], TRUE, TRUE, 0);
 		    face.push_back(new FaceTextureGTK(hbox, faceImgDim));
 			face[i]->setName(rName);
 		}

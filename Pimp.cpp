@@ -77,9 +77,11 @@ void Pimp::startupProcess()
     // Face Recognition
    // fisherfaces = new Fisherfaces(faceDir+"NewFaceSet");
     eigenfaces = new Eigenfaces(faceDir+"NewFaceSet");
+    initFaceRecognition();
     
     // Room Recognition
     roomRec = new RoomRecognition(roomDir+"NewRooms");
+    initRoomRecognition();
     
     // State Variables
     currentMode = RECOGNITION;
@@ -155,6 +157,26 @@ void Pimp::getNewTexture(BaseTextureGTK *tex){
 		cout<<"ERROR: getNewTexture - no current frame"<<endl;
 }
 
+void Pimp::getNewFace(FaceTextureGTK* faceText)
+{
+	// Create a new face texture
+    current_frame = video->getImage();
+	if(display_frame == NULL)
+    	display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
+    cvFlip (current_frame, display_frame, 1);
+    
+    // Get the largest face in the frame
+    CvRect r = cvRect(0,0,0,0);
+    r = faces->getFace(current_frame, r);
+    
+    cvSetImageROI(display_frame,r);
+    processed_face = facePreProcess->preProcess(display_frame);
+    cvResetImageROI(display_frame);
+    
+    // Save the processed face to the FaceTexture
+    faceText->setFace(display_frame, processed_face, r);
+}
+
 void Pimp::getNewFaceTextures(vector<FaceTextureGTK*> faceText)
 {    
     int maxFaces = faceText.size();
@@ -162,21 +184,7 @@ void Pimp::getNewFaceTextures(vector<FaceTextureGTK*> faceText)
     for(int i = 0; i < maxFaces; i++)
     {
         // Create a new face texture
-        current_frame = video->getImage();
-        display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
-        initFaceRecognition();
-        cvFlip (current_frame, display_frame, 1);
-        
-        // Get the largest face in the frame
-        CvRect r = cvRect(0,0,0,0);
-        r = faces->getFace(current_frame, r);
-        
-        cvSetImageROI(display_frame,r);
-        processed_face = facePreProcess->preProcess(display_frame);
-        cvResetImageROI(display_frame);
-        
-        // Save the processed face to the FaceTexture
-        faceText[i]->setFace(display_frame, processed_face, r);
+		getNewFace(faceText[i]);
     }
     
 }
@@ -277,10 +285,6 @@ void Pimp::initProcess()
     cycleNum = 0;
     lastFaceCycle = 0;
     lastRoomCycle = 0;
-    if( currentMode == RECOGNITION || currentMode == RECOGNITION_FACE)
-        initFaceRecognition();
-    if( currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM)
-        initRoomRecognition();
     current_frame = video->getImage();
     string test = dir + "test.jpg";
     cvSaveImage((char *)test.c_str(), current_frame);
@@ -289,6 +293,7 @@ void Pimp::initProcess()
 // Main Processing Loop
 void Pimp::mainProcess()
 {
+	cout<<"HERE"<<endl;
     current_frame = video->getImage();
     display_frame = cvCreateImage(cvSize (current_frame->width, current_frame->height), IPL_DEPTH_8U, 3);
     assert (current_frame && display_frame);
@@ -320,9 +325,9 @@ void Pimp::mainProcess()
     
     // Show the debug live video stream
     cvShowImage(WINDOW_NAME, display_frame);
-    cvWaitKey(1);
+   
 #endif
-    
+    // cvWaitKey(1);
     cycleNum++;
 }
 
