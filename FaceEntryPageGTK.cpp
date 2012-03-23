@@ -79,6 +79,11 @@ extern "C"{
 			gtk_entry_set_text((GtkEntry*)dialog,(char*)text.c_str());
 		}
 	}
+
+	void FaceEntry_updateDisplay(FaceEntryPageGTK* entryPage)
+	{
+		entryPage->updateFaceDisplay();
+	}
 }
 
 FaceEntryPageGTK::FaceEntryPageGTK()
@@ -95,6 +100,7 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 {
     // Window box to contain this page
     window = gtk_vbox_new (FALSE,1); 
+	name = rName;
 
     if(mode == NAME_ENTRY)
 	{
@@ -170,10 +176,10 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 	else if(mode == FACE_ACCEPTANCE)
 	{
 		// Turn on the camera
-    	Pimp::sharedPimp().videoOn();
-
+    	//Pimp::sharedPimp().videoOn();
+		string procLabel = rName + " Processing ...";
 		// label - rName
-		title = gtk_label_new((char*)rName.c_str());
+		title = gtk_label_new((char*)procLabel.c_str());
 		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
 		// hBox
@@ -212,10 +218,22 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 		gtk_box_pack_start( GTK_BOX(hbox), btn_next, TRUE, TRUE, 0);
 		
 		// Get the face textures
-		Pimp::sharedPimp().getNewFaceTextures(face);
+		//Pimp::sharedPimp().getNewFaceTextures(face);
 
-		Pimp::sharedPimp().videoOff();
+		// Create a timer
+		delayFunc = gtk_idle_add_priority( G_PRIORITY_LOW, (GSourceFunc) FaceEntry_updateDisplay, (gpointer) this);
+ 
+		//Pimp::sharedPimp().videoOff();
 	}   
+}
+
+void FaceEntryPageGTK::updateFaceDisplay()
+{
+	Pimp::sharedPimp().videoOn();
+	Pimp::sharedPimp().getNewFaceTextures(face);
+	Pimp::sharedPimp().videoOff();
+	gtk_label_set_text(GTK_LABEL(title), (gchar*)name.c_str());
+	gtk_idle_remove(delayFunc);
 }
 
 // Display

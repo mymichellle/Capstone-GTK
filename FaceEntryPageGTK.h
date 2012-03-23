@@ -45,10 +45,11 @@ private:
     GtkWidget *keyboard;
     
     // Properties
-    std::string *name;
+    std::string name;
         
     // Face Textures
     std::vector<FaceTextureGTK*> face;
+	guint delayFunc;
     
     void cleanUp();
     
@@ -58,6 +59,7 @@ public:
     
     // Display
     void display();
+	void updateFaceDisplay();
 };
 
 #endif
