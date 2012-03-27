@@ -16,6 +16,7 @@
 enum RoomEntryMode
 {
 	INIT_ROOM,
+	NAME_ROOM,
 	IMG_ROOM
 };
 
@@ -36,8 +37,10 @@ private:
     
     // Buttons
     GtkWidget *btn_back;
-    GtkWidget *btn_add;
+    GtkWidget *btn_next;
     GtkWidget *btn_new;
+	GtkWidget *btn_record;
+	GtkWidget *btn_play;
     
 	// img
 	RoomTextureGTK *room;
