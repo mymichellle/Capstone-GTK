@@ -64,21 +64,31 @@ DisplayPageGTK::DisplayPageGTK()
 	
     
 	// Title
-    title = gtk_label_new("Display Page");
+	if(!Pimp::sharedPimp().isFaceRecognition() && !Pimp::sharedPimp().isRoomRecognition())
+		title = gtk_label_new("No Recognition Mode is selected!");
+	else
+    	title = gtk_label_new("Display Page");
     gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
 	GtkWidget *box = gtk_hbox_new (TRUE, 1);
 	
-    personTitle = gtk_label_new("Person: ");
-    gtk_box_pack_start(GTK_BOX (box), personTitle, TRUE, TRUE, 0);
+	if(Pimp::sharedPimp().isFaceRecognition())
+	{
+    	personTitle = gtk_label_new("Person: ");
+    	gtk_box_pack_start(GTK_BOX (box), personTitle, TRUE, TRUE, 0);
+	}	
     personName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), personName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
 
 	box = gtk_hbox_new(TRUE,1);
 
-    roomTitle = gtk_label_new("Room: ");
-    gtk_box_pack_start(GTK_BOX (box), roomTitle, TRUE, TRUE, 0);
+	if(Pimp::sharedPimp().isRoomRecognition())
+	{
+    	roomTitle = gtk_label_new("Room: ");
+    	gtk_box_pack_start(GTK_BOX (box), roomTitle, TRUE, TRUE, 0);
+	}
+
     roomName =gtk_label_new( "");
     gtk_box_pack_start(GTK_BOX (box), roomName, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(window), box, TRUE, TRUE, 0);
@@ -125,11 +135,23 @@ void DisplayPageGTK::display()
 
 void DisplayPageGTK::setPersonName(std::string name)
 {
-	gtk_label_set_text(GTK_LABEL( personName), (gchar*)name.c_str());	
+	if(personName == NULL)
+		return;
+
+	if(Pimp::sharedPimp().isFaceRecognition())
+		gtk_label_set_text(GTK_LABEL( personName), (gchar*)name.c_str());
+	else
+		gtk_label_set_text(GTK_LABEL( personName), "");		
 }
 
 void DisplayPageGTK::setRoomName(std::string name)
 {
-	gtk_label_set_text(GTK_LABEL( roomName), (gchar*)name.c_str());
+	if(roomName == NULL)
+		return;
+	if(Pimp::sharedPimp().isRoomRecognition())
+		gtk_label_set_text(GTK_LABEL( roomName), (gchar*)name.c_str());
+	else
+		gtk_label_set_text(GTK_LABEL( roomName), "");
+		
 }
 

@@ -18,7 +18,7 @@ RoomRecognition::RoomRecognition(string roomsFile)
     xmlFileName = roomsFile+".xml";
     nRooms = 0;
     loadFromXml();
-    
+    prevRoom = 0;
 }
 
 void RoomRecognition::saveToXml()
@@ -304,6 +304,7 @@ string RoomRecognition::recognizeRoom(IplImage *image)
     
     // Detect and describe interest points in the frame
     surfDetDes(image, ipts, false, 4, 4, 2, 0.0006f);
+
 #ifdef DEBUG_ROOMS
  	// Draw box around object
      for(int i = 0; i < 4; i++ )
@@ -319,34 +320,34 @@ string RoomRecognition::recognizeRoom(IplImage *image)
 
     cvShowImage("REC ROOM", image);
 #endif
-    //cout<<endl<<"RECOGNIZE ROOMS FROM "<< nRooms <<" SAMPLES"<<endl;
+
+	// Compare to the previously detected room first
+	getMatches(ipts,roomRefIpts[prevRoom],matches);
+	int cornersTranslated = translateCorners(matches, src_corners, dst_corners);
+	if(cornersTranslated)
+	{
+		prevCount++;
+    	return roomNames[roomLookUp[prevRoom]];
+	}
+
     // Compare to all the rooms
     for( int i = 0; i < nRooms; i++)
     {
-        // Fill match vector
-        getMatches(ipts,roomRefIpts[i],matches);
-        int cornersTranslated = translateCorners(matches, src_corners, dst_corners);
-        
-        //cout<<"Room "<<i<<" translateCorners = "<<cornersTranslated<<" Matches: "<<matches.size()<<endl;
-        
-        // This call finds where the object corners should be in the frame
-        if (cornersTranslated)
-        {
-           /* // Draw box around object
-            for(int i = 0; i < 4; i++ )
-            {
-                CvPoint r1 = dst_corners[i%4];
-                CvPoint r2 = dst_corners[(i+1)%4];
-                cvLine( image, cvPoint(r1.x, r1.y),
-                       cvPoint(r2.x, r2.y), cvScalar(255,255,255), 3 );
-            }
-            
-            for (unsigned int i = 0; i < matches.size(); ++i)
-                drawIpoint(image, matches[i].first);*/
-            //cout<<"FOUND ROOM #"<<i<<endl;
-            return roomNames[roomLookUp[i]];
-        }
+		if(i != prevRoom)
+		{
+		    // Fill match vector
+		    getMatches(ipts,roomRefIpts[i],matches);
+		    int cornersTranslated = translateCorners(matches, src_corners, dst_corners);
+		    // This call finds where the object corners should be in the frame
+		    if (cornersTranslated)
+		    {
+				prevRoom = i;
+				prevCount = 0;
+		        return roomNames[roomLookUp[i]];
+		    }
+		}
     }
-
-    return "NO ROOM";
+	
+	prevCount = 0;
+    return " ";
 }

@@ -32,6 +32,8 @@ private:
     std::vector<int> nImgsPerRoom;
     int nRooms; // Number of test images
     int nNames; // Number of unique room names
+	int prevRoom; // Number of the previously identified room
+	int prevCount; // Count of consecutive times the room has been the same
     
     // Standard Corners
     CvPoint src_corners[4];
@@ -43,9 +45,10 @@ private:
 public:
     RoomRecognition(std::string roomsFile);
     void addRoom(RoomTextureGTK *room);
-    
+
     std::string recognizeRoom(IplImage *image);
-    
+    int getConsecutiveRoomCount(){return prevCount;};
+	void resetCount(){prevCount = 0;};
 };
 
 #endif

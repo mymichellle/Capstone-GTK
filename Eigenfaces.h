@@ -39,11 +39,16 @@ private:
     std::vector<int> nImagesPerson;
     int nPersons;
     bool empty;
+
+	int prevPerson; // Number of the previously identified person
+	int prevCount; // Count of consecutive times the person has been the same
     
     // Training Data
     CvMat * trainPersonNumMat;
                       // the number of people in the training set
     
+	float * projectedTestFace;
+
     // Helper Functions
     void storeTrainingData();
     int  loadTrainingData(CvMat ** pTrainPersonNumMat);
@@ -51,8 +56,7 @@ private:
     int loadFaceImgArray(char * filename);
     void storeEigenfaceImages();
     IplImage* convertFloatImageToUcharImage(const IplImage *srcImg);
-    int  findNearestNeighbor(float * projectedTestFace);
-    int findNearestNeighbor(float * projectedTestFace, float *pConfidence);
+    int findNearestNeighbor(float * pprojectedTestFace, float *pConfidence);
     void createTextFile();
     
 public:
@@ -61,6 +65,8 @@ public:
     void update();
     std::string recognizeFace(IplImage* preProcessedFace);
     void addFace(FaceTextureGTK *face);
+    int getConsecutiveFaceCount(){return prevCount;};
+	void resetCount(){prevCount = 0;};
 };
 
 #endif

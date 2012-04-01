@@ -35,6 +35,9 @@ Eigenfaces::Eigenfaces(string filename)
     eigenValMat                 = 0; // eigenvalues
     projectedTrainFaceMat       = 0; // projected training faces
     
+	int prevPerson = 0; // Number of the previously identified person
+	int prevCount = 0;
+	
     CvMat * trainPersonNumMat = 0;  // the person numbers during training
     empty = true;
     
@@ -53,13 +56,15 @@ Eigenfaces::Eigenfaces(string filename)
         learn((char *)textFileName.c_str());
     }
     
-    
+    // Initialize the projectedTestFace
+	projectedTestFace = (float *)cvAlloc( nEigens*sizeof(float) );
     //createTextFile();
 }
 
 void Eigenfaces::update()
 {
-    learn((char*)textFileName.c_str());
+    learn((char*)textFileName.c_str());	
+	projectedTestFace = (float *)cvAlloc( nEigens*sizeof(float) );
 }
 
 //////////////////////////////////
@@ -412,7 +417,7 @@ IplImage* Eigenfaces::convertFloatImageToUcharImage(const IplImage *srcImg)
 }
 
 // Find the most likely person based on a detection. Returns the index, and stores the confidence value into pConfidence.
-int Eigenfaces::findNearestNeighbor(float * projectedTestFace, float *pConfidence)
+int Eigenfaces::findNearestNeighbor(float * pprojectedTestFace, float *pConfidence)
 {
 	//double leastDistSq = 1e12;
 	double leastDistSq = DBL_MAX;
@@ -424,7 +429,7 @@ int Eigenfaces::findNearestNeighbor(float * projectedTestFace, float *pConfidenc
         
 		for(i=0; i<nEigens; i++)
 		{
-			float d_i = projectedTestFace[i] - projectedTrainFaceMat->data.fl[iTrain*nEigens + i];
+			float d_i = pprojectedTestFace[i] - projectedTrainFaceMat->data.fl[iTrain*nEigens + i];
 #ifdef USE_MAHALANOBIS_DISTANCE
 			distSq += d_i*d_i / eigenValMat->data.fl[i];  // Mahalanobis distance (might give better results than Eucalidean distance)
 #else
@@ -451,7 +456,6 @@ int Eigenfaces::findNearestNeighbor(float * projectedTestFace, float *pConfidenc
 // Recognize the face in the preprocessed face
 std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
 {
-	float * projectedTestFace = 0;
     float confidence;
     int iNearest, nearest;
     
@@ -463,22 +467,32 @@ std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
     }
     
     // project the preProcessedFace onto the PCA subspace
-	projectedTestFace = (float *)cvAlloc( nEigens*sizeof(float) );
-    
     cvEigenDecomposite(preProcessedFace, nEigens, eigenVectArr, 0, 0, pAvgTrainImg, projectedTestFace);
     iNearest = findNearestNeighbor(projectedTestFace, &confidence);
     nearest  = trainPersonNumMat->data.i[iNearest];
     
+	if(nearest == prevPerson)
+	{
+		prevCount++;
+	}
+	else
+	{
+		prevPerson = nearest;
+		prevCount = 0;
+	}
     //cout<<"nearest = "<< personNames[nearest]  << " Confidence = " << confidence << endl;
     
     std::stringstream output;
     output << personNames[nearest] <<" "<< confidence;
-    //return ss.str();
-    //cout<< personNames[nearest]<<" "<<confidence;
+
     if(confidence > FACE_RECOGNITION_CONFIDENCE)
         return output.str();
     else
+	{
+		prevPerson = nearest;
+		prevCount = 0;
         return "NO_CONFIDENCE";
+	}	
 }
 
 void Eigenfaces::addFace(FaceTextureGTK *face)
