@@ -60,6 +60,7 @@ public:
     // Display
     void display();
 	void updateFaceDisplay();
+
 };
 
 #endif
