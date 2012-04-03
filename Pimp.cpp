@@ -77,11 +77,11 @@ void Pimp::startupProcess()
     
     // Face Recognition
    // fisherfaces = new Fisherfaces(faceDir+"NewFaceSet");
-    eigenfaces = new Eigenfaces(faceDir+"NewFaceSet");
+    eigenfaces = new Eigenfaces(faceDir+"capstoneTest");
     initFaceRecognition();
     
     // Room Recognition
-    roomRec = new RoomRecognition(roomDir+"NewRooms");
+    roomRec = new RoomRecognition(roomDir+"capstoneTest");
     initRoomRecognition();
     
     // State Variables
@@ -286,20 +286,25 @@ void Pimp::initProcess()
     cycleNum = 0;
     lastFaceCycle = 0;
     lastRoomCycle = 0;
+	actualFaceRate = faceRate;
+	actualRoomRate = roomRate;
     current_frame = video->getImage();
-    string test = dir + "test.jpg";
-    cvSaveImage((char *)test.c_str(), current_frame);
+	eigenfaces->resetCount();
+	roomRec->resetCount();
 }
 
 // Main Processing Loop
 void Pimp::mainProcess()
 {
     current_frame = video->getImage();
+	if(current_frame == NULL)
+		return;
+
 	bool doFace = false;
 	bool doRoom = false;    
-	if( (cycleNum - lastFaceCycle == faceRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) )
+	if((currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) && (cycleNum - lastFaceCycle == actualFaceRate))
     	doFace = true;
-	if( (cycleNum - lastRoomCycle == roomRate) && (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM))
+	if( (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM) && (cycleNum - lastRoomCycle == actualRoomRate))
     	doRoom = true;
 
 	if(doRoom || doFace)
@@ -315,6 +320,18 @@ void Pimp::mainProcess()
 		{
 		    faceRecognition();
 		    lastFaceCycle = cycleNum;
+			
+			if(eigenfaces->getConsecutiveFaceCount() > 3)
+			{
+				if(actualFaceRate < 10)
+					actualFaceRate++;
+			}
+			else
+				actualFaceRate = faceRate;
+
+			// Only do one process per image do not increment cycle number but return so new image will be grabbed 
+			if(doRoom)
+				return;
 		}
 		
 		// Room Recognition
@@ -324,6 +341,15 @@ void Pimp::mainProcess()
 		    cvCvtColor( display_frame, gray_frame, CV_BGR2GRAY);
 		    roomRecognition();
 		    lastRoomCycle = cycleNum;
+
+			// If the same room is being found repeatedly cut down the amount of times we check
+			if(roomRec->getConsecutiveRoomCount() > 3)
+			{
+				if(actualRoomRate < 10)
+					actualRoomRate++;
+			}
+			else
+				actualRoomRate = roomRate;
 		}
 #ifdef SHOW_VIDEO
     // Draw the FPS figure
@@ -373,6 +399,7 @@ void Pimp::faceRecognition()
     }
     else
     {
+		eigenfaces->resetCount();
         personInImage = "";
     }
 #ifdef SHOW_VIDEO
@@ -397,7 +424,9 @@ void Pimp::roomRecognition()
 {
     string roomNumber = roomRec->recognizeRoom(gray_frame);
     roomInImage = roomNumber;
+#ifdef SHOW_VIDEO
     cvPutText(display_frame, (char*)roomNumber.c_str(), cvPoint(50, 50), &font, CV_RGB(255,0,0));
+#endif
 }
 
 // Initialize Audio Utility

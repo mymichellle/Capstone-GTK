@@ -69,6 +69,8 @@ private:
     // Recognition Rate
     int faceRate;
     int roomRate;
+	int actualFaceRate;
+	int actualRoomRate;
     
     // Video Image Capture
     VideoStream *video;
