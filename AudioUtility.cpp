@@ -6,7 +6,7 @@
 
 #include "AudioUtility.h"
 #include "portaudio.h"
-#define SOUND_DEBUG
+//#define SOUND_DEBUG
 
 using namespace std;
 

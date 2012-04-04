@@ -31,12 +31,14 @@ extern "C"{
 
 	void SettingsPage_onRoomSlider(GtkWidget *range)
 	{
-		Pimp::sharedPimp().setRoomRecRate(gtk_range_get_value((GtkRange*)range));
+		//Pimp::sharedPimp().setRoomRecRate(gtk_range_get_value((GtkRange*)range));
+		Pimp::sharedPimp().setRoomAudioRate(gtk_range_get_value((GtkRange*)range));
 	}
 
 	void SettingsPage_onFaceSlider(GtkWidget *range)
 	{
-		Pimp::sharedPimp().setFaceRecRate(gtk_range_get_value((GtkRange*)range));
+		//Pimp::sharedPimp().setFaceRecRate(gtk_range_get_value((GtkRange*)range));
+		Pimp::sharedPimp().setFaceAudioRate(gtk_range_get_value((GtkRange*)range));
 	}
 }
 

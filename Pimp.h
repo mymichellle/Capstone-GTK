@@ -65,12 +65,16 @@ private:
     int cycleNum;
     int lastRoomCycle;
     int lastFaceCycle;
+	int lastFaceAudio;
+	int lastRoomAudio;
     
     // Recognition Rate
     int faceRate;
     int roomRate;
 	int actualFaceRate;
 	int actualRoomRate;
+	int audioRoomRate;
+	int audioFaceRate;
     
     // Video Image Capture
     VideoStream *video;
@@ -106,6 +110,7 @@ private:
     std::string unknownFacesDoc;
     std::string roomDir;
     std::string soundDir;
+	std::string	audioFile;
     
     // Output
     std::string personInImage;
@@ -128,7 +133,9 @@ public:
 	void setFaceRec(bool faceRecOn);
 	void setFaceRecRate(int faceRecRate);
 	void setRoomRec(bool roomRecOn);
-	void setRoomRecRate(int roomRecRate);    
+	void setRoomRecRate(int roomRecRate);
+	void setRoomAudioRate(int roomAudio);
+	void setFaceAudioRate(int faceAudio);    
     
     // Set active page
     void setDisplayPage(BasePageGTK *newPage);

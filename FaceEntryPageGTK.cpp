@@ -22,16 +22,22 @@ extern "C"{
 		    Pimp::sharedPimp().videoOff();
 	}
 
-    void FaceEntryPage_onRecordEntry(GtkWidget *btn)
+    void FaceEntryPage_onRecordEntry(GtkWidget *btn, GtkWidget *label)
     {
+		string fileName = gtk_label_get_text(GTK_LABEL(label));
+    	transform(fileName.begin(), fileName.end(), fileName.begin(), ::tolower);
+		fileName = fileName+".dat";
         // Record Audio Clip for Current Face
-        Pimp::sharedPimp().recordSound("test.dat");
+        Pimp::sharedPimp().recordSound((char*)fileName.c_str());
     }
 
-    void FaceEntryPage_onPlayEntry(GtkWidget *btn)
+    void FaceEntryPage_onPlayEntry(GtkWidget *btn, GtkWidget *label)
     {
+		string fileName = gtk_label_get_text(GTK_LABEL(label));
+    	transform(fileName.begin(), fileName.end(), fileName.begin(), ::tolower);
+		fileName = fileName+".dat";
         // Playback Current Audio Recording for Current Face
-        Pimp::sharedPimp().playbackSound("test.dat");
+        Pimp::sharedPimp().playbackSound((char*)fileName.c_str());
     }
 
 	void FaceEntryPage_onBackEntry(GtkWidget *btn, GtkWidget *label)
@@ -164,12 +170,12 @@ void FaceEntryPageGTK::initPage(enum FaceEntryMode mode, std::string rName)
 
 		btn_record = gtk_button_new_with_label ("RECORD");
         gtk_signal_connect (GTK_OBJECT (btn_record), "clicked",
-		                    GTK_SIGNAL_FUNC (FaceEntryPage_onRecordEntry), NULL);
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onRecordEntry), title);
 		gtk_box_pack_start( GTK_BOX(window), btn_record, TRUE, TRUE, 0);
 
 		btn_play = gtk_button_new_with_label ("PLAY");
         gtk_signal_connect (GTK_OBJECT (btn_play), "clicked",
-		                    GTK_SIGNAL_FUNC (FaceEntryPage_onPlayEntry), NULL);
+		                    GTK_SIGNAL_FUNC (FaceEntryPage_onPlayEntry), title);
 		gtk_box_pack_start( GTK_BOX(window), btn_play, TRUE, TRUE, 0);
 
 		// hBox

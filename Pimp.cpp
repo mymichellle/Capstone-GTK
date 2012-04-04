@@ -263,6 +263,16 @@ void Pimp::setRoomRecRate(int roomRecRate)
 	}
 }    
 
+void Pimp::setRoomAudioRate(int roomAudio)
+{
+	audioRoomRate = roomAudio;
+}
+
+void Pimp::setFaceAudioRate(int faceAudio)
+{
+	audioFaceRate = faceAudio;
+}
+
 // Get Recognition modes
 bool Pimp::isFaceRecognition()
 {
@@ -286,11 +296,14 @@ void Pimp::initProcess()
     cycleNum = 0;
     lastFaceCycle = 0;
     lastRoomCycle = 0;
-	actualFaceRate = faceRate;
-	actualRoomRate = roomRate;
+	lastFaceAudio = 0;
+	lastRoomAudio = 0;
+	actualFaceRate = 2;
+	actualRoomRate = 2;
     current_frame = video->getImage();
 	eigenfaces->resetCount();
 	roomRec->resetCount();
+	audioFile = "";
 }
 
 // Main Processing Loop
@@ -301,11 +314,17 @@ void Pimp::mainProcess()
 		return;
 
 	bool doFace = false;
-	bool doRoom = false;    
+	bool doFaceAudio = false;
+	bool doRoom = false;
+	bool doRoomAudio = false;    
 	if((currentMode == RECOGNITION || currentMode == RECOGNITION_FACE) && (cycleNum - lastFaceCycle == actualFaceRate))
     	doFace = true;
 	if( (currentMode == RECOGNITION || currentMode == RECOGNITION_ROOM) && (cycleNum - lastRoomCycle == actualRoomRate))
     	doRoom = true;
+	if( audioFaceRate > 0 && cycleNum - lastFaceAudio == audioFaceRate )
+		doFaceAudio = true;
+	if( audioRoomRate > 0 && cycleNum - lastRoomAudio == audioRoomRate )
+		doRoomAudio = true;
 
 	if(doRoom || doFace)
 	{
@@ -329,6 +348,16 @@ void Pimp::mainProcess()
 			else
 				actualFaceRate = faceRate;
 
+			if(doFaceAudio)
+			{
+				// Play back Person's Name
+				audioFile = getRecognizedPerson();
+				transform(audioFile.begin(), audioFile.end(), audioFile.begin(), ::tolower);
+				audioFile = audioFile+".dat";
+				playbackSound((char*)audioFile.c_str());
+				lastFaceAudio = cycleNum;
+			}
+
 			// Only do one process per image do not increment cycle number but return so new image will be grabbed 
 			if(doRoom)
 				return;
@@ -350,6 +379,16 @@ void Pimp::mainProcess()
 			}
 			else
 				actualRoomRate = roomRate;
+			
+			if(doRoomAudio)
+			{
+				// Play back Room's Name
+				audioFile = getRecognizedRoom();
+				transform(audioFile.begin(), audioFile.end(), audioFile.begin(), ::tolower);
+				audioFile = audioFile+".dat";
+				playbackSound((char*)audioFile.c_str());
+				lastRoomAudio = cycleNum;
+			}
 		}
 #ifdef SHOW_VIDEO
     // Draw the FPS figure
@@ -400,7 +439,7 @@ void Pimp::faceRecognition()
     else
     {
 		eigenfaces->resetCount();
-        personInImage = "";
+        personInImage = "...";
     }
 #ifdef SHOW_VIDEO
     // Add the recognized text to display frame

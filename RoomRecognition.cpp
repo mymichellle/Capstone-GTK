@@ -341,6 +341,16 @@ string RoomRecognition::recognizeRoom(IplImage *image)
 		    // This call finds where the object corners should be in the frame
 		    if (cornersTranslated)
 		    {
+
+ // Draw box around object 	
+        for(int j = 0; j < 4; j++ )
+            {
+                CvPoint r1 = dst_corners[j%4];
+                CvPoint r2 = dst_corners[(j+1)%4];
+                cvLine( image, cvPoint(r1.x, r1.y),
+                       cvPoint(r2.x, r2.y), cvScalar(255,255,255), 3 );
+     }
+
 				prevRoom = i;
 				prevCount = 0;
 		        return roomNames[roomLookUp[i]];
@@ -349,5 +359,5 @@ string RoomRecognition::recognizeRoom(IplImage *image)
     }
 	
 	prevCount = 0;
-    return " ";
+    return "...";
 }

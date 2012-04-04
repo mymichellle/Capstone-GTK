@@ -483,7 +483,7 @@ std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
     //cout<<"nearest = "<< personNames[nearest]  << " Confidence = " << confidence << endl;
     
     std::stringstream output;
-    output << personNames[nearest] <<" "<< confidence;
+    output << personNames[nearest]; //<<" "<< confidence;
 
     if(confidence > FACE_RECOGNITION_CONFIDENCE)
         return output.str();
@@ -491,7 +491,7 @@ std::string Eigenfaces::recognizeFace(IplImage* preProcessedFace)
 	{
 		prevPerson = nearest;
 		prevCount = 0;
-        return "NO_CONFIDENCE";
+        return "...";
 	}	
 }
 
