@@ -54,7 +54,6 @@ void AudioUtility::recordSound(char* fileName)
     {
         printf("Error Initializing Port Audio");
         Pa_Terminate();
-        break;
     }
 
 #ifdef SOUND_DEBUG
@@ -80,7 +79,6 @@ void AudioUtility::recordSound(char* fileName)
     {
         fprintf(stderr, "Error: No default input device.\n");
         Pa_Terminate();
-        break;
         //goto error;
     }
     inputParameters.channelCount = NUM_CHANNELS;
@@ -103,19 +101,24 @@ void AudioUtility::recordSound(char* fileName)
     {
         printf("Error: Pa_OpenStream()");
         Pa_Terminate();
-        break;
     }
 
 #ifdef SOUND_DEBUG
     printf("Now recording!!\n"); fflush(stdout);
 #endif
 
+
+    err = Pa_StartStream( stream );
+	if( err != paNoError )
+    {
+        printf("Error: Pa_StartStream()");
+        Pa_Terminate();
+    };
     err = Pa_ReadStream( stream, recordedSamples, totalFrames );
     if( err != paNoError )
     {
         printf("Error: Pa_ReadStream()");
         Pa_Terminate();
-        break;
     };
     
     err = Pa_CloseStream( stream );
@@ -123,7 +126,6 @@ void AudioUtility::recordSound(char* fileName)
     {
         printf("Error: Pa_CloseStream()");
         Pa_Terminate();
-        break;
     }
 
     /* Measure maximum peak amplitude. */
