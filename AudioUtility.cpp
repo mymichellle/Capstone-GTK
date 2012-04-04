@@ -50,8 +50,12 @@ void AudioUtility::recordSound(char* fileName)
 
     /* Initialize PortAudio */
     err = Pa_Initialize();
-    if (err != paNoError) //goto error;
+    if (err != paNoError)
+    {
         printf("Error Initializing Port Audio");
+        Pa_Terminate();
+        break;
+    }
 
 #ifdef SOUND_DEBUG
     PaDeviceIndex numDevices = Pa_GetDeviceCount();
@@ -75,6 +79,8 @@ void AudioUtility::recordSound(char* fileName)
     if (inputParameters.device == paNoDevice)
     {
         fprintf(stderr, "Error: No default input device.\n");
+        Pa_Terminate();
+        break;
         //goto error;
     }
     inputParameters.channelCount = NUM_CHANNELS;
@@ -93,17 +99,32 @@ void AudioUtility::recordSound(char* fileName)
         NULL,   /* no callback */
         NULL ); /* no callback, no callback userData */
 
-    if (err != paNoError ) {}//goto error;
+    if (err != paNoError )
+    {
+        printf("Error: Pa_OpenStream()");
+        Pa_Terminate();
+        break;
+    }
 
 #ifdef SOUND_DEBUG
     printf("Now recording!!\n"); fflush(stdout);
 #endif
 
     err = Pa_ReadStream( stream, recordedSamples, totalFrames );
-    if( err != paNoError ) {}//goto error;
+    if( err != paNoError )
+    {
+        printf("Error: Pa_ReadStream()");
+        Pa_Terminate();
+        break;
+    };
     
     err = Pa_CloseStream( stream );
-    if( err != paNoError ) {}//goto error;
+    if( err != paNoError )
+    {
+        printf("Error: Pa_CloseStream()");
+        Pa_Terminate();
+        break;
+    }
 
     /* Measure maximum peak amplitude. */
     max = 0;
