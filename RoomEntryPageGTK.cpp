@@ -35,6 +35,27 @@ extern "C"{
 		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(NAME_ROOM, gtk_label_get_text(GTK_LABEL(label))));
 	}
 
+    void RoomEntryPage_onRecordSound(GtkWidget *btn, GtkWidget *label)
+    {
+        // Record Room name
+        string fileName = gtk_label_get_text(GTK_LABEL(label));
+        transform(fileName.begin(), fileName.end(), fileName.begin(), ::tolower);
+        fileName = fileName + ".dat";
+        // Record Audio Clip for Current Room
+        Pimp::sharedPimp().recordSound((char *)fileName.c_str());
+    }
+
+    void RoomEntryPage_onPlaybackSound(GtkWidget *btn, GtkWidget *label)
+    {
+        // Playback Room name
+        string fileName = gtk_label_get_text(GTK_LABEL(label));
+        transform(fileName.begin(), fileName.end(), fileName.begin(), ::tolower);
+        fileName = fileName + ".dat";
+        // Playback Audio Clip for Current Room
+        Pimp::sharedPimp().playbackSound((char *)fileName.c_str());
+
+    }
+
 	void RoomEntryPage_onNewImg(GtkWidget *btn, GtkWidget *label)
 	{
 		Pimp::sharedPimp().setDisplayPage(new RoomEntryPageGTK(IMG_ROOM, gtk_label_get_text(GTK_LABEL(label))));
@@ -142,9 +163,13 @@ void RoomEntryPageGTK::initPage(enum RoomEntryMode mode, std::string rName)
 		gtk_box_pack_start(GTK_BOX (window), title, TRUE, TRUE, 0);
 
 		btn_record = gtk_button_new_with_label ("RECORD");
+                gtk_signal_connect (GTK_OBJECT (btn_record), "clicked",
+                                    GTK_SIGNAL_FUNC (RoomEntryPage_onRecordSound), title);
 		gtk_box_pack_start( GTK_BOX(window), btn_record, TRUE, TRUE, 0);
 
 		btn_play = gtk_button_new_with_label ("PLAY");
+                gtk_signal_connect (GTK_OBJECT (btn_play), "clicked",
+                                    GTK_SIGNAL_FUNC (RoomEntryPage_onPlaybackSound), title);
 		gtk_box_pack_start( GTK_BOX(window), btn_play, TRUE, TRUE, 0);
 
 		// hBox
